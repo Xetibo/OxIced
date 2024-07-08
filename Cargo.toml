@@ -1,0 +1,14 @@
+[package]
+name = "oxiced"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+iced = { git = "https://github.com/iced-rs/iced", features = [
+  "advanced",
+  "canvas",
+] }
+once_cell = "1.19.0"
+serde = "1.0.204"
+toml = "0.8.14"
+xdg = "2.5.2"
