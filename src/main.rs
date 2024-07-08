@@ -1,4 +1,3 @@
-// just a small testing ground for themed iced.rs widgets
 use iced::widget::{column, text, Column};
 use iced::{Alignment, Length, Theme};
 use theme::{get_all_themes, get_theme};
