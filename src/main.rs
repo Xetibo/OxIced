@@ -1,7 +1,7 @@
 use iced::widget::{column, text, Column};
 use iced::{Alignment, Length, Theme};
 use theme::{get_all_themes, get_theme};
-use widgets::oxi_button::button;
+use widgets::oxi_button::{button, ButtonVariant};
 use widgets::oxi_checkbox::checkbox;
 use widgets::oxi_picklist::pick_list;
 use widgets::oxi_progress::progress_bar;
@@ -87,9 +87,11 @@ impl Counter {
 
 fn counter_box<'a>(state: &Counter) -> Column<'a, Message> {
     column![
-        button("Increment").on_press(Message::Increment(10)),
+        button("Increment", ButtonVariant::Primary).on_press(Message::Increment(10)),
         text(state.value).size(50),
-        button("Decrement").on_press(Message::Decrement(20)),
+        button("Decrement", ButtonVariant::Secondary).on_press(Message::Decrement(20)),
+        button("success", ButtonVariant::Success).on_press(Message::Increment(10)),
+        button("danger", ButtonVariant::Danger).on_press(Message::Increment(10)),
         checkbox("what", state.is_checked, |_| { Message::Check() }),
         radio("first", 10, None, Message::Increment),
         radio("second", 20, None, Message::Increment),

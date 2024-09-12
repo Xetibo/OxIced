@@ -41,8 +41,9 @@ pub fn checkbox<'a>(
     user_on_toggle: impl Fn(bool) -> Message + 'a,
 ) -> Checkbox<'a, Message> {
     iced::widget::checkbox(label, is_checked)
-        .size(20)
+        .size(22)
         .spacing(10)
+        .width(10)
         .style(checkbox_style)
         .text_line_height(LineHeight::Relative(2.0))
         .on_toggle(user_on_toggle)

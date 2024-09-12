@@ -6,10 +6,12 @@ use iced::{
         palette::{Background, Danger, Extended, Pair, Primary, Secondary, Success},
         Palette,
     },
-    Theme,
+    Color, Theme,
 };
 use once_cell::sync::Lazy;
-use serde::Deserialize;
+use serde::{de::DeserializeOwned, Deserialize};
+
+use crate::widgets::common::{darken_color, lighten_color};
 
 pub fn get_all_themes() -> Vec<Theme> {
     let current = get_theme().clone();
@@ -47,6 +49,145 @@ pub const TOKYO_NIGHT_DARK: Palette = Palette {
     success: color!(0x9ece6a),    // Green
     danger: color!(0xf7768e),     // Red
 };
+
+pub trait TomlTheme {
+    fn name(&self) -> String;
+}
+
+pub struct Base16 {
+    name: String,
+    base00: Color, //base
+    base01: Color, //mantle
+    base02: Color, //surface0
+    base03: Color, //surface1
+    base04: Color, //surface2
+    base05: Color, //text
+    base06: Color, //rosewater
+    base07: Color, //lavender
+    base08: Color, //red
+    base09: Color, //peach
+    base0a: Color, //yellow
+    base0b: Color, //green
+    base0c: Color, //teal
+    base0d: Color, //blue
+    base0e: Color, //mauve
+    base0f: Color, //flamingo
+}
+
+#[derive(Deserialize)]
+pub struct TomlBase16 {
+    name: String,
+    base00: String, // Default Background
+    base01: String, // Lighter Background (Used for status bars, line number and folding marks)
+    base02: String, // Selection Background
+    base03: String, // Comments, Invisibles, Line Highlighting
+    base04: String, // Dark Foreground (Used for status bars)
+    base05: String, // Default Foreground, Caret, Delimiters, Operators
+    base06: String, // Light Foreground (Not often used)
+    base07: String, // Light Background (Not often used)
+    base08: String, // Variables, XML Tags, Markup Link Text, Markup Lists, Diff Deleted
+    base09: String, // Integers, Boolean, Constants, XML Attributes, Markup Link Url
+    base0a: String, // Classes, Markup Bold, Search Text Background
+    base0b: String, // Strings, Inherited Class, Markup Code, Diff Inserted
+    base0c: String, // Support, Regular Expressions, Escape Characters, Markup Quotes
+    base0d: String, // Functions, Methods, Attribute IDs, Headings
+    base0e: String, // Keywords, Storage, Selector, Markup Italic, Diff Changed
+    base0f: String, // Deprecated, Opening/Closing Embedded Language Tags, e.g. <?php ?>
+}
+
+impl From<TomlBase16> for Extended {
+    fn from(val: TomlBase16) -> Self {
+        Extended {
+            background: Background {
+                base: Pair {
+                    color: color!(u32::from_str_radix(&val.base00, 16).unwrap_or(0) as f32),
+                    text: color!(u32::from_str_radix(&val.base05, 16).unwrap_or(0) as f32),
+                },
+                weak: Pair {
+                    color: color!(u32::from_str_radix(&val.base01, 16).unwrap_or(0) as f32),
+                    text: color!(u32::from_str_radix(&val.base03, 16).unwrap_or(0) as f32),
+                },
+                strong: Pair {
+                    color: color!(u32::from_str_radix(&val.base02, 16).unwrap_or(0) as f32),
+                    text: color!(u32::from_str_radix(&val.base04, 16).unwrap_or(0) as f32),
+                },
+            },
+            primary: Primary {
+                base: Pair {
+                    color: lighten_color(color!(
+                        u32::from_str_radix(&val.base00, 16).unwrap_or(0) as f32
+                    )),
+                    text: color!(u32::from_str_radix(&val.base05, 16).unwrap_or(0) as f32),
+                },
+                weak: Pair {
+                    color: color!(u32::from_str_radix(&val.base02, 16).unwrap_or(0) as f32),
+                    text: color!(u32::from_str_radix(&val.base03, 16).unwrap_or(0) as f32),
+                },
+                strong: Pair {
+                    color: color!(u32::from_str_radix(&val.base04, 16).unwrap_or(0) as f32),
+                    text: color!(u32::from_str_radix(&val.base04, 16).unwrap_or(0) as f32),
+                },
+            },
+            secondary: Secondary {
+                base: Pair {
+                    color: color!(u32::from_str_radix(&val.base03, 16).unwrap_or(0) as f32),
+                    text: color!(u32::from_str_radix(&val.base05, 16).unwrap_or(0) as f32),
+                },
+                weak: Pair {
+                    color: color!(u32::from_str_radix(&val.base02, 16).unwrap_or(0) as f32),
+                    text: color!(u32::from_str_radix(&val.base06, 16).unwrap_or(0) as f32),
+                },
+                strong: Pair {
+                    color: color!(u32::from_str_radix(&val.base04, 16).unwrap_or(0) as f32),
+                    text: color!(u32::from_str_radix(&val.base04, 16).unwrap_or(0) as f32),
+                },
+            },
+            success: Success {
+                base: Pair {
+                    color: color!(u32::from_str_radix(&val.base0b, 16).unwrap_or(0) as f32),
+                    text: color!(u32::from_str_radix(&val.base01, 16).unwrap_or(0) as f32),
+                },
+                weak: Pair {
+                    color: darken_color(color!(
+                        u32::from_str_radix(&val.base0b, 16).unwrap_or(0) as f32
+                    )),
+                    text: color!(u32::from_str_radix(&val.base01, 16).unwrap_or(0) as f32),
+                },
+                strong: Pair {
+                    color: lighten_color(color!(
+                        u32::from_str_radix(&val.base0b, 16).unwrap_or(0) as f32
+                    )),
+                    text: color!(u32::from_str_radix(&val.base01, 16).unwrap_or(0) as f32),
+                },
+            },
+            danger: Danger {
+                base: Pair {
+                    color: color!(u32::from_str_radix(&val.base08, 16).unwrap_or(0) as f32),
+                    text: color!(u32::from_str_radix(&val.base01, 16).unwrap_or(0) as f32),
+                },
+                weak: Pair {
+                    color: darken_color(color!(
+                        u32::from_str_radix(&val.base08, 16).unwrap_or(0) as f32
+                    )),
+                    text: color!(u32::from_str_radix(&val.base01, 16).unwrap_or(0) as f32),
+                },
+                strong: Pair {
+                    color: lighten_color(color!(
+                        u32::from_str_radix(&val.base08, 16).unwrap_or(0) as f32
+                    )),
+                    text: color!(u32::from_str_radix(&val.base01, 16).unwrap_or(0) as f32),
+                },
+            },
+            is_dark: true,
+        }
+    }
+}
+
+impl TomlTheme for TomlBase16 {
+    fn name(&self) -> String {
+        self.name.clone()
+    }
+}
 
 #[derive(Deserialize)]
 pub struct TomlSimple {
@@ -158,6 +299,12 @@ impl From<TomlExtended> for Extended {
     }
 }
 
+impl TomlTheme for TomlExtended {
+    fn name(&self) -> String {
+        self.name.clone()
+    }
+}
+
 #[derive(Deserialize)]
 pub struct TomlPalette {
     base: TomlPair,
@@ -185,11 +332,23 @@ static THEME: Lazy<Theme> = Lazy::new(|| {
         );
     }
     let theme_string = theme_string.unwrap();
+    let base16_theme = parse_extended_palette::<TomlBase16>(&theme_string);
+    if let Some(theme) = base16_theme {
+        return theme;
+    }
     let theme = parse_simple_palette(&theme_string);
     if let Some(theme) = theme {
         return theme;
     }
-    parse_extended_palette(&theme_string)
+    let extended_theme = parse_extended_palette::<TomlExtended>(&theme_string);
+    if let Some(theme) = extended_theme {
+        return theme;
+    }
+    Theme::custom_with_fn(
+        TOKYO_NIGHT_DARK_NAME.into(),
+        TOKYO_NIGHT_DARK,
+        tokyo_generate,
+    )
 });
 
 fn get_theme_toml() -> std::io::Result<String> {
@@ -220,20 +379,20 @@ fn parse_simple_palette(theme_string: &str) -> Option<Theme> {
     ))
 }
 
-fn parse_extended_palette(theme_string: &str) -> Theme {
-    let parsed_theme: Result<TomlExtended, _> = toml::from_str(theme_string);
+fn parse_extended_palette<T: DeserializeOwned + TomlTheme + Into<Extended>>(
+    theme_string: &str,
+) -> Option<Theme> {
+    let parsed_theme: Result<T, _> = toml::from_str(theme_string);
     if let Err(error) = parsed_theme {
         println!("Could not parse theme file: {}", error);
-        return Theme::custom_with_fn(
-            TOKYO_NIGHT_DARK_NAME.into(),
-            TOKYO_NIGHT_DARK,
-            tokyo_generate,
-        );
+        return None;
     }
     let parsed_theme = parsed_theme.unwrap();
-    Theme::custom_with_fn(parsed_theme.name.clone(), TOKYO_NIGHT_DARK, |_: Palette| {
-        parsed_theme.into()
-    })
+    Some(Theme::custom_with_fn(
+        parsed_theme.name(),
+        TOKYO_NIGHT_DARK,
+        |_: Palette| parsed_theme.into(),
+    ))
 }
 
 fn tokyo_generate(palette: Palette) -> Extended {

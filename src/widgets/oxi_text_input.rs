@@ -6,6 +6,8 @@ use iced::{
 
 use crate::Message;
 
+use super::common::darken_color;
+
 pub fn text_input_style(theme: &Theme, status: Status) -> Style {
     let palette = theme.extended_palette();
     let mut style = Style {
@@ -16,7 +18,7 @@ pub fn text_input_style(theme: &Theme, status: Status) -> Style {
             radius: Radius::from(10),
         },
         icon: palette.background.base.text,
-        placeholder: palette.primary.weak.color,
+        placeholder: palette.primary.weak.text,
         value: palette.background.base.text,
         selection: palette.primary.strong.color,
     };
