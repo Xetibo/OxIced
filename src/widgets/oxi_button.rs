@@ -7,7 +7,7 @@ use iced::{
 
 use crate::Message;
 
-use super::common::StylingCategory;
+use super::common::{lighten_color, StylingCategory};
 
 pub enum ButtonVariant {
     Primary,
@@ -47,11 +47,13 @@ fn states(status: Status, base: Style, palette: &impl StylingCategory) -> Style 
     match status {
         Status::Active => base,
         Status::Pressed => Style {
-            background: Some(iced::Background::Color(palette.strong().color)),
+            background: Some(iced::Background::Color(lighten_color(
+                palette.strong().color,
+            ))),
             ..base
         },
         Status::Hovered => Style {
-            background: Some(iced::Background::Color(palette.base().color)),
+            background: Some(iced::Background::Color(lighten_color(palette.base().color))),
             ..base
         },
         Status::Disabled => disabled(base),

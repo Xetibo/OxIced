@@ -22,6 +22,7 @@ pub fn main() -> iced::Result {
 
 struct Counter {
     value: i64,
+    slider_value: i64,
     theme: Theme,
     is_checked: bool,
     is_toggled: bool,
@@ -32,6 +33,7 @@ impl Default for Counter {
     fn default() -> Self {
         Self {
             value: 0,
+            slider_value: 0,
             theme: get_theme(),
             is_checked: false,
             is_toggled: false,
@@ -42,6 +44,7 @@ impl Default for Counter {
 
 #[derive(Debug, Clone)]
 enum Message {
+    Slider(i64),
     Increment(i64),
     Decrement(i64),
     TextChanged(String),
@@ -53,6 +56,9 @@ enum Message {
 impl Counter {
     fn update(&mut self, message: Message) {
         match message {
+            Message::Slider(val) => {
+                self.slider_value = val;
+            }
             Message::Increment(val) => {
                 self.value += val;
             }
@@ -95,10 +101,12 @@ fn counter_box<'a>(state: &Counter) -> Column<'a, Message> {
         checkbox("what", state.is_checked, |_| { Message::Check() }),
         radio("first", 10, None, Message::Increment),
         radio("second", 20, None, Message::Increment),
-        slider(0..=100, 50, |val| Message::Increment(val as i64)),
+        slider(0..=100, state.slider_value as i32, |val| Message::Slider(
+            val as i64
+        )),
         text_input("something", state.text.as_str(), Message::TextChanged),
         toggler(Some(state.text.clone()), state.is_toggled, Message::Toggle),
-        progress_bar(0.0..=100.0, 50.0),
+        progress_bar(0.0..=100.0, state.slider_value as f32),
         horizontal_rule(100),
         vertical_rule(100),
     ]

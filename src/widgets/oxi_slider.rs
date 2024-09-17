@@ -13,7 +13,7 @@ pub fn slider_style(theme: &Theme, status: Status) -> Style {
     let palette = theme.extended_palette();
     let style = Style {
         rail: Rail {
-            colors: (palette.primary.strong.color, palette.primary.weak.color),
+            colors: (palette.primary.base.color, palette.background.weak.color),
             width: 20.0,
             border_radius: Radius::from(10),
         },
