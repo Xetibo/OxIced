@@ -13,15 +13,19 @@ pub fn slider_style(theme: &Theme, status: Status) -> Style {
     let palette = theme.extended_palette();
     let style = Style {
         rail: Rail {
-            colors: (palette.primary.base.color, palette.background.weak.color),
+            backgrounds: (
+                iced::Background::Color(palette.primary.base.color),
+                iced::Background::Color(palette.background.weak.color),
+            ),
             width: 20.0,
-            border_radius: Radius::from(10),
+            // TODO
+            border: Default::default(),
         },
         handle: Handle {
             shape: HandleShape::Circle { radius: 8.0 },
-            color: palette.primary.base.text,
             border_width: 2.0,
             border_color: palette.primary.base.text,
+            background: iced::Background::Color(palette.primary.base.text),
         },
     };
     match status {

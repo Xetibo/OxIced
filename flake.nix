@@ -38,10 +38,21 @@
                   libGL
                   libxkbcommon
                   wayland
+                  pkg-config
+                  libclang
                 ];
             in
             pkgs.mkShell {
               inputsFrom = builtins.attrValues self'.packages;
+              buildInputs = with pkgs; [
+                libGL
+                libxkbcommon
+                wayland
+                pkg-config
+                libclang
+                glib
+                pango
+              ];
               packages = with pkgs; [
                 cargo
                 cargo-watch
@@ -50,6 +61,7 @@
                 clippy
               ];
               LD_LIBRARY_PATH = libPath;
+              LIBCLANG_PATH = "${pkgs.libclang.lib}/lib";
 
             };
 

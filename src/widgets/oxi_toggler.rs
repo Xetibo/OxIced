@@ -1,6 +1,8 @@
 use iced::{
     widget::{
-        text::LineHeight, toggler::{Status, Style}, Toggler
+        text::LineHeight,
+        toggler::{Status, Style},
+        Toggler,
     },
     Theme,
 };
@@ -26,6 +28,8 @@ pub fn toggler_style(theme: &Theme, status: Status) -> Style {
             style.background = palette.primary.weak.color;
             style
         }
+        // TODO
+        Status::Disabled => style,
     }
 }
 
@@ -34,7 +38,8 @@ pub fn toggler<'a>(
     is_checked: bool,
     on_toggle: impl Fn(bool) -> Message + 'a,
 ) -> Toggler<'a, Message> {
-    iced::widget::toggler(label, is_checked, on_toggle)
+    // TODO label and on toggle
+    iced::widget::toggler(is_checked)
         .text_line_height(LineHeight::Relative(4.0))
         .size(30)
         .style(toggler_style)
