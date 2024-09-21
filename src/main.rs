@@ -1,6 +1,8 @@
+use std::collections::HashMap;
+
 use iced::theme::palette;
 use iced::widget::container::Style;
-use iced::widget::{column, container, text, Column};
+use iced::widget::{column, container, row, text, Column, Row};
 use iced::{event, Alignment, Element, Event, Length, Subscription, Task, Theme};
 use theme::{get_all_themes, get_theme};
 use widgets::oxi_button::{button, ButtonVariant};
@@ -49,6 +51,7 @@ struct Counter {
     is_checked: bool,
     is_toggled: bool,
     text: String,
+    clipboard_content: HashMap<i32, String>,
 }
 
 impl Default for Counter {
@@ -60,6 +63,8 @@ impl Default for Counter {
             is_checked: false,
             is_toggled: false,
             text: "".into(),
+            clipboard_content: Default::default(),
+            // TODO handle err
         }
     }
 }
@@ -74,17 +79,19 @@ enum WindowDirection {
 
 #[derive(Debug, Clone)]
 enum Message {
-    Slider(i64),
-    Increment(i64),
-    Decrement(i64),
-    TextChanged(String),
-    Check(),
-    Toggle(bool),
-    Theme(Theme),
+    //Slider(i64),
+    Copy(String),
+    Remove(i32),
+    AddTestElement(String),
+    //TextChanged(String),
+    //Check(),
+    //kToggle(bool),
+    //Theme(Theme),
     //TextInput(String),
     //Direction(WindowDirection),
     //SizeChange((u32, u32)),
     //IcedEvent(Event),
+    Empty(String),
 }
 impl TryInto<LayershellCustomActions> for Message {
     type Error = Self;
@@ -158,35 +165,54 @@ impl Application for Counter {
     }
 
     fn update(&mut self, message: Message) -> Task<Message> {
-        match message {
-            Message::Slider(val) => {
-                self.slider_value = val;
+        let task = match message {
+            //Message::Slider(val) => {
+            //    self.slider_value = val;
+            //}
+            //Message::Increment(val) => {
+            //    self.value += val;
+            //}
+            //Message::Decrement(val) => {
+            //    self.value -= val;
+            //}
+            //Message::Theme(theme) => self.theme = theme,
+            //Message::Check() => {
+            //    self.is_checked = !self.is_checked;
+            //}
+            //Message::Toggle(val) => {
+            //    self.is_toggled = val;
+            //    self.text += "1";
+            //}
+            //Message::TextChanged(val) => self.text = val,
+            // TODO
+            Message::AddTestElement(value) => {
+                self.clipboard_content
+                    .insert(self.clipboard_content.len() as i32, value);
+                Task::none()
             }
-            Message::Increment(val) => {
-                self.value += val;
+            Message::Copy(value) => iced::clipboard::write::<Message>(value.clone()),
+            //let res = self.clipboard.set().text(value);
+            //if res.is_err() {
+            //    println!("got error lul {:#?}", res.err());
+            //}
+            Message::Empty(value) => {
+                self.text = value;
+                Task::none()
             }
-            Message::Decrement(val) => {
-                self.value -= val;
+            Message::Remove(index) => {
+                self.clipboard_content.remove(&index);
+                Task::none()
             }
-            Message::Theme(theme) => self.theme = theme,
-            Message::Check() => {
-                self.is_checked = !self.is_checked;
-            }
-            Message::Toggle(val) => {
-                self.is_toggled = val;
-                self.text += "1";
-            }
-            Message::TextChanged(val) => self.text = val,
-            //_ => (),
+            _ => Task::none(),
         };
-        Task::none()
+        task
     }
 
     fn view(&self) -> Element<Message> {
         wrap_in_rounded_box(
             column![
                 testing_box_2(self),
-                pick_list(get_all_themes(), Some(&self.theme), Message::Theme).width(Length::Fill),
+                //pick_list(get_all_themes(), Some(&self.theme), Message::Theme).width(Length::Fill),
             ]
             .padding(20)
             .max_width(530)
@@ -212,37 +238,57 @@ impl Application for Counter {
     }
 }
 
-fn testing_box_2<'a>(state: &Counter) -> Column<'a, Message> {
-    column![
-        button("Increment", ButtonVariant::Primary).on_press(Message::Increment(10)),
-        text(state.value).size(50),
-        button("Decrement", ButtonVariant::Secondary).on_press(Message::Decrement(20)),
+fn clipboard_element<'a>(index: i32, contents: &str) -> Row<'a, Message> {
+    row![
+        button(text(contents.to_owned()), ButtonVariant::Primary)
+            .on_press(Message::Copy(contents.to_owned())),
+        button("X", ButtonVariant::Primary).on_press(Message::Remove(index)),
     ]
     .padding(20)
-    .max_width(500)
-    .align_x(Alignment::Center)
 }
 
-fn testing_box<'a>(state: &Counter) -> Column<'a, Message> {
-    column![
-        button("Increment", ButtonVariant::Primary).on_press(Message::Increment(10)),
-        text(state.value).size(50),
-        button("Decrement", ButtonVariant::Secondary).on_press(Message::Decrement(20)),
-        button("success", ButtonVariant::Success).on_press(Message::Increment(10)),
-        button("danger", ButtonVariant::Danger).on_press(Message::Increment(10)),
-        checkbox("what", state.is_checked, |_| { Message::Check() }),
-        radio("first", 10, None, Message::Increment),
-        radio("second", 20, None, Message::Increment),
-        slider(0..=100, state.slider_value as i32, |val| Message::Slider(
-            val as i64
-        )),
-        text_input("something", state.text.as_str(), Message::TextChanged),
-        toggler(Some(state.text.clone()), state.is_toggled, Message::Toggle),
-        progress_bar(0.0..=100.0, state.slider_value as f32),
-        horizontal_rule(100),
-        vertical_rule(100),
+fn testing_box_2<'a>(state: &Counter) -> Column<'a, Message> {
+    let elements: Vec<Row<'_, Message>> = state
+        .clipboard_content
+        .iter()
+        .map(|(key, value)| clipboard_element(*key, value))
+        .collect();
+    let mut col = column![
+        text_input("something", state.text.as_str(), Message::Empty),
+        button("AddTestElement", ButtonVariant::Primary)
+            .on_press(Message::AddTestElement("henlo".into())),
     ]
     .padding(20)
     .max_width(500)
-    .align_x(Alignment::Center)
+    .align_x(Alignment::Center);
+
+    for element in elements {
+        col = col.push_maybe(Some(element));
+    }
+
+    col
 }
+
+//fn testing_box<'a>(state: &Counter) -> Column<'a, Message> {
+//    column![
+//        button("Increment", ButtonVariant::Primary).on_press(Message::Increment(10)),
+//        text(state.value).size(50),
+//        button("Decrement", ButtonVariant::Secondary).on_press(Message::Decrement(20)),
+//        button("success", ButtonVariant::Success).on_press(Message::Increment(10)),
+//        button("danger", ButtonVariant::Danger).on_press(Message::Increment(10)),
+//        checkbox("what", state.is_checked, |_| { Message::Check() }),
+//        radio("first", 10, None, Message::Increment),
+//        radio("second", 20, None, Message::Increment),
+//        slider(0..=100, state.slider_value as i32, |val| Message::Slider(
+//            val as i64
+//        )),
+//        text_input("something", state.text.as_str(), Message::TextChanged),
+//        toggler(Some(state.text.clone()), state.is_toggled, Message::Toggle),
+//        progress_bar(0.0..=100.0, state.slider_value as f32),
+//        horizontal_rule(100),
+//        vertical_rule(100),
+//    ]
+//    .padding(20)
+//    .max_width(500)
+//    .align_x(Alignment::Center)
+//}
