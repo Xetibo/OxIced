@@ -1,24 +1,19 @@
 use std::collections::HashMap;
 
-use iced::theme::palette;
+use iced::advanced::subscription;
+use iced::keyboard::key::Named;
 use iced::widget::container::Style;
 use iced::widget::{column, container, row, text, Column, Row};
-use iced::{event, Alignment, Element, Event, Length, Subscription, Task, Theme};
-use theme::{get_all_themes, get_theme};
+use iced::{event, futures, window, Alignment, Element, Subscription, Task, Theme};
+use theme::get_theme;
 use widgets::oxi_button::{button, ButtonVariant};
-use widgets::oxi_checkbox::checkbox;
-use widgets::oxi_picklist::pick_list;
-use widgets::oxi_progress::progress_bar;
-use widgets::oxi_radio::radio;
-use widgets::oxi_rule::{horizontal_rule, vertical_rule};
-use widgets::oxi_slider::slider;
 use widgets::oxi_text_input::text_input;
-use widgets::oxi_toggler::toggler;
 
 use iced_layershell::actions::LayershellCustomActions;
 use iced_layershell::reexport::{Anchor, Layer};
 use iced_layershell::settings::{LayerShellSettings, Settings};
 use iced_layershell::Application;
+use zbus::{proxy, Connection};
 
 mod theme;
 mod widgets;
@@ -45,25 +40,23 @@ pub fn main() -> Result<(), iced_layershell::Error> {
 }
 
 struct Counter {
-    value: i64,
-    slider_value: i64,
     theme: Theme,
-    is_checked: bool,
-    is_toggled: bool,
     text: String,
     clipboard_content: HashMap<i32, String>,
 }
 
 impl Default for Counter {
     fn default() -> Self {
+        let data = futures::executor::block_on(get_items());
+        let map = if let Ok(map) = data {
+            map
+        } else {
+            HashMap::new()
+        };
         Self {
-            value: 0,
-            slider_value: 0,
             theme: get_theme(),
-            is_checked: false,
-            is_toggled: false,
             text: "".into(),
-            clipboard_content: Default::default(),
+            clipboard_content: map,
             // TODO handle err
         }
     }
@@ -80,9 +73,11 @@ enum WindowDirection {
 #[derive(Debug, Clone)]
 enum Message {
     //Slider(i64),
-    Copy(String),
+    Copy(i32),
     Remove(i32),
+    ClearClipboard,
     AddTestElement(String),
+    Exit,
     //TextChanged(String),
     //Check(),
     //kToggle(bool),
@@ -161,11 +156,25 @@ impl Application for Counter {
 
     fn subscription(&self) -> iced::Subscription<Self::Message> {
         //event::listen().map(Message::IcedEvent)
-        Subscription::none()
+        event::listen_with(|event, _status, _id| match event {
+            iced::Event::Keyboard(event) => match event {
+                iced::keyboard::Event::KeyPressed {
+                    modifiers,
+                    key: iced::keyboard::key::Key::Named(Named::Escape),
+                    modified_key,
+                    physical_key,
+                    location,
+                    text,
+                } => Some(Message::Exit),
+                _ => None,
+            },
+            _ => None,
+        })
+        //Subscription::none()
     }
 
     fn update(&mut self, message: Message) -> Task<Message> {
-        let task = match message {
+        match message {
             //Message::Slider(val) => {
             //    self.slider_value = val;
             //}
@@ -190,7 +199,11 @@ impl Application for Counter {
                     .insert(self.clipboard_content.len() as i32, value);
                 Task::none()
             }
-            Message::Copy(value) => iced::clipboard::write::<Message>(value.clone()),
+            Message::Copy(value) => {
+                let _ = futures::executor::block_on(copy_to_clipboard(value as u32));
+                // TODO make this work with iced exit?
+                std::process::exit(0);
+            }
             //let res = self.clipboard.set().text(value);
             //if res.is_err() {
             //    println!("got error lul {:#?}", res.err());
@@ -203,9 +216,17 @@ impl Application for Counter {
                 self.clipboard_content.remove(&index);
                 Task::none()
             }
+            Message::ClearClipboard => {
+                let _ = futures::executor::block_on(delete_all());
+                // TODO make this work with iced exit?
+                std::process::exit(0);
+            }
+            Message::Exit => {
+                // TODO make this work with iced exit?
+                std::process::exit(0);
+            }
             _ => Task::none(),
-        };
-        task
+        }
     }
 
     fn view(&self) -> Element<Message> {
@@ -214,7 +235,7 @@ impl Application for Counter {
                 testing_box_2(self),
                 //pick_list(get_all_themes(), Some(&self.theme), Message::Theme).width(Length::Fill),
             ]
-            .padding(20)
+            .padding(5)
             .max_width(530)
             .align_x(Alignment::Center),
         )
@@ -240,8 +261,7 @@ impl Application for Counter {
 
 fn clipboard_element<'a>(index: i32, contents: &str) -> Row<'a, Message> {
     row![
-        button(text(contents.to_owned()), ButtonVariant::Primary)
-            .on_press(Message::Copy(contents.to_owned())),
+        button(text(contents.to_owned()), ButtonVariant::Primary).on_press(Message::Copy(index)),
         button("X", ButtonVariant::Primary).on_press(Message::Remove(index)),
     ]
     .padding(20)
@@ -255,8 +275,11 @@ fn testing_box_2<'a>(state: &Counter) -> Column<'a, Message> {
         .collect();
     let mut col = column![
         text_input("something", state.text.as_str(), Message::Empty),
-        button("AddTestElement", ButtonVariant::Primary)
-            .on_press(Message::AddTestElement("henlo".into())),
+        row![
+            button("AddTestElement", ButtonVariant::Primary)
+                .on_press(Message::AddTestElement("henlo".into())),
+            button("Clear all", ButtonVariant::Primary).on_press(Message::ClearClipboard)
+        ],
     ]
     .padding(20)
     .max_width(500)
@@ -267,6 +290,45 @@ fn testing_box_2<'a>(state: &Counter) -> Column<'a, Message> {
     }
 
     col
+}
+
+#[proxy(
+    interface = "org.Xetibo.OxiPasteDaemon",
+    default_service = "org.Xetibo.OxiPasteDaemon",
+    default_path = "/org/Xetibo/OxiPasteDaemon"
+)]
+trait OxiPasteDbus {
+    async fn GetAll(&self) -> zbus::Result<Vec<(Vec<u8>, String)>>;
+    async fn Paste(&self, index: u32) -> zbus::Result<()>;
+    async fn DeleteAll(&self) -> zbus::Result<()>;
+}
+
+async fn get_items() -> zbus::Result<HashMap<i32, String>> {
+    let connection = Connection::session().await?;
+    let proxy = OxiPasteDbusProxy::new(&connection).await?;
+    let reply = proxy.GetAll().await?;
+
+    let mut map = HashMap::new();
+    for item in reply {
+        if item.1.contains("text") {
+            map.insert(map.len() as i32, String::from_utf8(item.0).unwrap());
+        }
+    }
+    Ok(map)
+}
+
+async fn copy_to_clipboard(index: u32) -> zbus::Result<()> {
+    let connection = Connection::session().await?;
+    let proxy = OxiPasteDbusProxy::new(&connection).await?;
+    proxy.Paste(index).await?;
+    Ok(())
+}
+
+async fn delete_all() -> zbus::Result<()> {
+    let connection = Connection::session().await?;
+    let proxy = OxiPasteDbusProxy::new(&connection).await?;
+    proxy.DeleteAll().await?;
+    Ok(())
 }
 
 //fn testing_box<'a>(state: &Counter) -> Column<'a, Message> {

@@ -2336,6 +2336,7 @@ dependencies = [
  "serde",
  "toml",
  "xdg",
+ "zbus",
 ]
 
 [[package]]
