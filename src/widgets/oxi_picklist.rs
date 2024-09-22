@@ -7,9 +7,7 @@ use iced::{
     Border, Theme,
 };
 
-use crate::Message;
-
-use super::common::{darken_color, lighten_color};
+use super::common::darken_color;
 
 pub fn picklist_style(
     theme: &Theme,
@@ -57,15 +55,16 @@ pub fn menu_style(theme: &Theme) -> menu::Style {
     }
 }
 
-pub fn pick_list<'a, T, L, V>(
+pub fn pick_list<'a, T, L, V, M>(
     options: L,
     selected: Option<V>,
-    on_selected: impl Fn(T) -> Message + 'a,
-) -> PickList<'a, T, L, V, Message>
+    on_selected: impl Fn(T) -> M + 'a,
+) -> PickList<'a, T, L, V, M>
 where
     T: ToString + PartialEq + Clone + 'a,
     L: Borrow<[T]> + 'a,
     V: Borrow<T> + 'a,
+    M: Clone,
 {
     iced::widget::pick_list(options, selected, on_selected)
         .padding(10)

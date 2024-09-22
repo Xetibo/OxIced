@@ -1,13 +1,10 @@
 use iced::{
-    border::Radius,
     widget::{
         slider::{Handle, HandleShape, Rail, Status, Style},
         Slider,
     },
     Theme,
 };
-
-use crate::Message;
 
 pub fn slider_style(theme: &Theme, status: Status) -> Style {
     let palette = theme.extended_palette();
@@ -35,13 +32,14 @@ pub fn slider_style(theme: &Theme, status: Status) -> Style {
     }
 }
 
-pub fn slider<'a, V>(
+pub fn slider<'a, V, M>(
     range: std::ops::RangeInclusive<V>,
     value: V,
-    on_change: impl Fn(V) -> Message + 'a,
-) -> Slider<'a, V, Message>
+    on_change: impl Fn(V) -> M + 'a,
+) -> Slider<'a, V, M>
 where
     V: Copy + From<u8> + std::cmp::PartialOrd,
+    M: Clone,
 {
     iced::widget::slider(range, value, on_change).style(slider_style)
 }

@@ -4,8 +4,6 @@ use iced::{
     Border, Theme,
 };
 
-use crate::Message;
-
 use super::common::darken_color;
 
 pub fn text_input_style(theme: &Theme, status: Status) -> Style {
@@ -44,11 +42,14 @@ pub fn text_input_style(theme: &Theme, status: Status) -> Style {
     }
 }
 
-pub fn text_input<'a>(
+pub fn text_input<'a, M>(
     placeholder: &str,
     value: &str,
-    on_text_changed: impl Fn(String) -> Message + 'a,
-) -> iced::widget::TextInput<'a, Message> {
+    on_text_changed: impl Fn(String) -> M + 'a,
+) -> iced::widget::TextInput<'a, M>
+where
+    M: Clone,
+{
     iced::widget::text_input(placeholder, value)
         .padding(10)
         .on_input(on_text_changed)

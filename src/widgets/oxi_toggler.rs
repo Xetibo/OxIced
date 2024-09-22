@@ -7,8 +7,6 @@ use iced::{
     Theme,
 };
 
-use crate::Message;
-
 pub fn toggler_style(theme: &Theme, status: Status) -> Style {
     let palette = theme.extended_palette();
     let mut style = Style {
@@ -33,11 +31,7 @@ pub fn toggler_style(theme: &Theme, status: Status) -> Style {
     }
 }
 
-pub fn toggler<'a>(
-    label: impl Into<Option<String>>,
-    is_checked: bool,
-    on_toggle: impl Fn(bool) -> Message + 'a,
-) -> Toggler<'a, Message> {
+pub fn toggler<'a, M>(is_checked: bool) -> Toggler<'a, M> {
     // TODO label and on toggle
     iced::widget::toggler(is_checked)
         .text_line_height(LineHeight::Relative(4.0))

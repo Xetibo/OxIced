@@ -8,8 +8,6 @@ use iced::{
     Border, Theme,
 };
 
-use crate::Message;
-
 pub fn checkbox_style(theme: &Theme, status: Status) -> Style {
     let palette = theme.extended_palette();
     let mut style = Style {
@@ -35,11 +33,11 @@ pub fn checkbox_style(theme: &Theme, status: Status) -> Style {
     }
 }
 
-pub fn checkbox<'a>(
+pub fn checkbox<'a, M>(
     label: impl Into<String>,
     is_checked: bool,
-    user_on_toggle: impl Fn(bool) -> Message + 'a,
-) -> Checkbox<'a, Message> {
+    user_on_toggle: impl Fn(bool) -> M + 'a,
+) -> Checkbox<'a, M> {
     iced::widget::checkbox(label, is_checked)
         .size(22)
         .spacing(10)

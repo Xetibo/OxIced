@@ -1,11 +1,8 @@
 use iced::{
     border::Radius,
-    theme::palette::Extended,
     widget::button::{Status, Style},
     Border, Element, Shadow, Theme, Vector,
 };
-
-use crate::Message;
 
 use super::common::{lighten_color, StylingCategory};
 
@@ -84,10 +81,10 @@ fn danger_button(theme: &Theme, status: Status) -> Style {
     states(status, base, &palette.danger)
 }
 
-pub fn button<'a>(
-    content: impl Into<Element<'a, Message>>,
+pub fn button<'a, M>(
+    content: impl Into<Element<'a, M>>,
     variant: ButtonVariant,
-) -> iced::widget::Button<'a, Message> {
+) -> iced::widget::Button<'a, M> {
     let style = match variant {
         ButtonVariant::Primary => primary_button,
         ButtonVariant::Secondary => secondary_button,

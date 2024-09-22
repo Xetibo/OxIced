@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use iced::advanced::subscription;
 use iced::keyboard::key::Named;
 use iced::widget::container::Style;
-use iced::widget::{column, container, row, text, Column, Row};
+use iced::widget::{column, container, rich_text, row, scrollable, span, text, Column, Row};
 use iced::{event, futures, window, Alignment, Element, Subscription, Task, Theme};
 use theme::get_theme;
 use widgets::oxi_button::{button, ButtonVariant};
@@ -231,13 +231,8 @@ impl Application for Counter {
 
     fn view(&self) -> Element<Message> {
         wrap_in_rounded_box(
-            column![
-                testing_box_2(self),
-                //pick_list(get_all_themes(), Some(&self.theme), Message::Theme).width(Length::Fill),
-            ]
-            .padding(5)
-            .max_width(530)
-            .align_x(Alignment::Center),
+            window(self),
+            //pick_list(get_all_themes(), Some(&self.theme), Message::Theme).width(Length::Fill),
         )
     }
 
@@ -261,35 +256,45 @@ impl Application for Counter {
 
 fn clipboard_element<'a>(index: i32, contents: &str) -> Row<'a, Message> {
     row![
-        button(text(contents.to_owned()), ButtonVariant::Primary).on_press(Message::Copy(index)),
-        button("X", ButtonVariant::Primary).on_press(Message::Remove(index)),
+        button(
+            rich_text!(span(contents.to_owned())),
+            ButtonVariant::Primary
+        )
+        .padding([20, 5])
+        .width(iced::Length::Fill)
+        .on_press(Message::Copy(index)),
+        button("X", ButtonVariant::Primary)
+            .on_press(Message::Remove(index))
+            .padding([20, 5]),
     ]
     .padding(20)
+    .spacing(20)
 }
 
-fn testing_box_2<'a>(state: &Counter) -> Column<'a, Message> {
+fn window<'a>(state: &Counter) -> Column<'a, Message> {
     let elements: Vec<Row<'_, Message>> = state
         .clipboard_content
         .iter()
         .map(|(key, value)| clipboard_element(*key, value))
         .collect();
-    let mut col = column![
+
+    let mut elements_col = column![];
+    for element in elements {
+        elements_col = elements_col.push_maybe(Some(element));
+    }
+    let elements_scrollable = scrollable(elements_col);
+
+    column![
         text_input("something", state.text.as_str(), Message::Empty),
         row![
             button("AddTestElement", ButtonVariant::Primary)
                 .on_press(Message::AddTestElement("henlo".into())),
             button("Clear all", ButtonVariant::Primary).on_press(Message::ClearClipboard)
         ],
+        elements_scrollable
     ]
-    .padding(20)
-    .max_width(500)
-    .align_x(Alignment::Center);
-
-    for element in elements {
-        col = col.push_maybe(Some(element));
-    }
-
-    col
+    .padding(10)
+    .align_x(Alignment::Center)
 }
 
 #[proxy(
