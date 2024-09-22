@@ -7,7 +7,7 @@ license = "LGPL-3.0-or-later"
 [dependencies]
 arboard = "3.4.1"
 iced = { version = "0.13", features = ["advanced", "canvas"] }
-iced_layershell = { git = "https://github.com/waycrate/exwlshelleventloop", branch = "iced_13" }
+iced_layershell = "0.7.1"
 once_cell = "1.19.0"
 serde = "1.0.204"
 toml = "0.8.14"
