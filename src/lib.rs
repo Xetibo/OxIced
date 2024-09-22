@@ -1,2 +1,2 @@
-mod theme;
-mod widgets;
+pub mod theme;
+pub mod widgets;

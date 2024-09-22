@@ -4,7 +4,6 @@ use iced::{
     Border, Theme,
 };
 
-use super::common::lighten_color;
 
 pub fn progress_style(theme: &Theme) -> Style {
     let palette = theme.extended_palette();
