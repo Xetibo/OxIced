@@ -7,8 +7,6 @@ use iced::{
     Theme,
 };
 
-use crate::Message;
-
 pub fn radio_style(theme: &Theme, status: Status) -> Style {
     let palette = theme.extended_palette();
     let mut style = Style {
@@ -27,14 +25,15 @@ pub fn radio_style(theme: &Theme, status: Status) -> Style {
     }
 }
 
-pub fn radio<'a, V>(
+pub fn radio<'a, V, M>(
     label: impl Into<String>,
     value: V,
     selected: Option<V>,
-    on_click: impl FnOnce(V) -> Message + 'a,
-) -> Radio<'a, Message>
+    on_click: impl FnOnce(V) -> M + 'a,
+) -> Radio<'a, M>
 where
     V: Copy + Eq,
+    M: Clone,
 {
     iced::widget::radio(label, value, selected, on_click)
         .size(20)

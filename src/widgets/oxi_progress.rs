@@ -4,12 +4,11 @@ use iced::{
     Border, Theme,
 };
 
-use super::common::lighten_color;
 
 pub fn progress_style(theme: &Theme) -> Style {
     let palette = theme.extended_palette();
     Style {
-        background: iced::Background::Color(lighten_color(palette.background.weak.color)),
+        background: iced::Background::Color(palette.background.weak.color),
         bar: iced::Background::Color(palette.primary.base.color),
         border: Border {
             color: palette.background.base.text,

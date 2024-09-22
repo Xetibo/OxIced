@@ -1,13 +1,10 @@
 use iced::{
     border::Radius,
-    theme::palette::Extended,
     widget::button::{Status, Style},
     Border, Element, Shadow, Theme, Vector,
 };
 
-use crate::Message;
-
-use super::common::StylingCategory;
+use super::common::{lighten_color, StylingCategory};
 
 pub enum ButtonVariant {
     Primary,
@@ -47,11 +44,13 @@ fn states(status: Status, base: Style, palette: &impl StylingCategory) -> Style 
     match status {
         Status::Active => base,
         Status::Pressed => Style {
-            background: Some(iced::Background::Color(palette.strong().color)),
+            background: Some(iced::Background::Color(lighten_color(
+                palette.strong().color,
+            ))),
             ..base
         },
         Status::Hovered => Style {
-            background: Some(iced::Background::Color(palette.base().color)),
+            background: Some(iced::Background::Color(lighten_color(palette.base().color))),
             ..base
         },
         Status::Disabled => disabled(base),
@@ -82,10 +81,10 @@ fn danger_button(theme: &Theme, status: Status) -> Style {
     states(status, base, &palette.danger)
 }
 
-pub fn button<'a>(
-    content: impl Into<Element<'a, Message>>,
+pub fn button<'a, M>(
+    content: impl Into<Element<'a, M>>,
     variant: ButtonVariant,
-) -> iced::widget::Button<'a, Message> {
+) -> iced::widget::Button<'a, M> {
     let style = match variant {
         ButtonVariant::Primary => primary_button,
         ButtonVariant::Secondary => secondary_button,

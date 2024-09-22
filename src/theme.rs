@@ -6,7 +6,7 @@ use iced::{
         palette::{Background, Danger, Extended, Pair, Primary, Secondary, Success},
         Palette,
     },
-    Color, Theme,
+    Theme,
 };
 use once_cell::sync::Lazy;
 use serde::{de::DeserializeOwned, Deserialize};
@@ -54,27 +54,28 @@ pub trait TomlTheme {
     fn name(&self) -> String;
 }
 
-pub struct Base16 {
-    name: String,
-    base00: Color, //base
-    base01: Color, //mantle
-    base02: Color, //surface0
-    base03: Color, //surface1
-    base04: Color, //surface2
-    base05: Color, //text
-    base06: Color, //rosewater
-    base07: Color, //lavender
-    base08: Color, //red
-    base09: Color, //peach
-    base0a: Color, //yellow
-    base0b: Color, //green
-    base0c: Color, //teal
-    base0d: Color, //blue
-    base0e: Color, //mauve
-    base0f: Color, //flamingo
-}
+//pub struct Base16 {
+//    name: String,
+//    base00: Color, //base
+//    base01: Color, //mantle
+//    base02: Color, //surface0
+//    base03: Color, //surface1
+//    base04: Color, //surface2
+//    base05: Color, //text
+//    base06: Color, //rosewater
+//    base07: Color, //lavender
+//    base08: Color, //red
+//    base09: Color, //peach
+//    base0a: Color, //yellow
+//    base0b: Color, //green
+//    base0c: Color, //teal
+//    base0d: Color, //blue
+//    base0e: Color, //mauve
+//    base0f: Color, //flamingo
+//}
 
 #[derive(Deserialize)]
+#[allow(dead_code)]
 pub struct TomlBase16 {
     name: String,
     base00: String, // Default Background

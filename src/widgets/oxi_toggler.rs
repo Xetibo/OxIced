@@ -1,11 +1,11 @@
 use iced::{
     widget::{
-        text::LineHeight, toggler::{Status, Style}, Toggler
+        text::LineHeight,
+        toggler::{Status, Style},
+        Toggler,
     },
     Theme,
 };
-
-use crate::Message;
 
 pub fn toggler_style(theme: &Theme, status: Status) -> Style {
     let palette = theme.extended_palette();
@@ -26,15 +26,14 @@ pub fn toggler_style(theme: &Theme, status: Status) -> Style {
             style.background = palette.primary.weak.color;
             style
         }
+        // TODO
+        Status::Disabled => style,
     }
 }
 
-pub fn toggler<'a>(
-    label: impl Into<Option<String>>,
-    is_checked: bool,
-    on_toggle: impl Fn(bool) -> Message + 'a,
-) -> Toggler<'a, Message> {
-    iced::widget::toggler(label, is_checked, on_toggle)
+pub fn toggler<'a, M>(is_checked: bool) -> Toggler<'a, M> {
+    // TODO label and on toggle
+    iced::widget::toggler(is_checked)
         .text_line_height(LineHeight::Relative(4.0))
         .size(30)
         .style(toggler_style)

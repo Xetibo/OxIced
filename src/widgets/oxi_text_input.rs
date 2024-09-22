@@ -4,17 +4,15 @@ use iced::{
     Border, Theme,
 };
 
-use crate::Message;
-
 use super::common::darken_color;
 
 pub fn text_input_style(theme: &Theme, status: Status) -> Style {
     let palette = theme.extended_palette();
     let mut style = Style {
-        background: iced::Background::Color(palette.primary.base.color),
+        background: iced::Background::Color(palette.background.weak.color),
         border: Border {
             color: palette.background.strong.color,
-            width: 3.0,
+            width: 0.0,
             radius: Radius::from(10),
         },
         icon: palette.background.base.text,
@@ -25,25 +23,33 @@ pub fn text_input_style(theme: &Theme, status: Status) -> Style {
     match status {
         Status::Active => style,
         Status::Hovered => {
-            style.background = iced::Background::Color(palette.primary.base.color);
+            // TODO: really? double darken
+            style.background = iced::Background::Color(darken_color(darken_color(
+                palette.background.strong.color,
+            )));
             style
         }
         Status::Focused => {
-            style.background = iced::Background::Color(palette.primary.base.color);
+            style.background = iced::Background::Color(darken_color(darken_color(
+                palette.background.strong.color,
+            )));
             style
         }
         Status::Disabled => {
-            style.background = iced::Background::Color(palette.primary.base.color);
+            style.background = iced::Background::Color(palette.background.base.color);
             style
         }
     }
 }
 
-pub fn text_input<'a>(
+pub fn text_input<'a, M>(
     placeholder: &str,
     value: &str,
-    on_text_changed: impl Fn(String) -> Message + 'a,
-) -> iced::widget::TextInput<'a, Message> {
+    on_text_changed: impl Fn(String) -> M + 'a,
+) -> iced::widget::TextInput<'a, M>
+where
+    M: Clone,
+{
     iced::widget::text_input(placeholder, value)
         .padding(10)
         .on_input(on_text_changed)
