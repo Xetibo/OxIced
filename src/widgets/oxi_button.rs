@@ -3,6 +3,7 @@ use iced::{
     widget::button::{Status, Style},
     Border, Element, Renderer, Shadow, Theme, Vector,
 };
+use iced_widget::button::StyleFn;
 
 use super::common::{lighten_color, StylingCategory};
 
@@ -81,15 +82,23 @@ fn danger_button(theme: &Theme, status: Status) -> Style {
     states(status, base, &palette.danger)
 }
 
-pub fn button<'a, M>(
+pub fn button<'a, M, T, Renderer>(
     content: impl Into<Element<'a, M, Theme, Renderer>>,
     variant: ButtonVariant,
-) -> iced::widget::Button<'a, M, Theme, Renderer> {
+) -> iced::widget::Button<'a, M, Theme, Renderer>
+where
+    //T::Class<'a>: From<StyleFn<'a, T>>,
+    //T: iced_widget::button::Catalog + 'a,
+    //&'aT: Into<&Theme>,
+    Renderer: iced_core::Renderer,
+{
     let style = match variant {
         ButtonVariant::Primary => primary_button,
         ButtonVariant::Secondary => secondary_button,
         ButtonVariant::Success => success_button,
         ButtonVariant::Danger => danger_button,
     };
-    iced::widget::button(content).padding(12).style(style)
+    iced_widget::button::<'a, M, Theme, Renderer>(content)
+        .padding(12)
+        .style(style)
 }
