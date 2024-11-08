@@ -82,7 +82,14 @@ fn danger_button(theme: &Theme, status: Status) -> Style {
 }
 
 pub fn button<'a, M>(
-    content: impl Into<Element<'a, M, Theme>>,
+    content: impl Into<
+        Element<
+            'a,
+            M,
+            Theme,
+            iced_renderer::fallback::Renderer<iced_wgpu::Renderer, iced_tiny_skia::Renderer>,
+        >,
+    >,
     variant: ButtonVariant,
 ) -> iced::widget::Button<'a, M> {
     let style = match variant {
