@@ -1,7 +1,7 @@
 use iced::{
     border::Radius,
     widget::button::{Status, Style},
-    Border, Element, Renderer, Shadow, Theme, Vector,
+    Border, Element, Shadow, Theme, Vector,
 };
 
 use super::common::{lighten_color, StylingCategory};
@@ -91,7 +91,12 @@ pub fn button<'a, M>(
         ButtonVariant::Success => success_button,
         ButtonVariant::Danger => danger_button,
     };
-    iced::widget::button::<'a, M, Theme, Renderer>(content)
-        .padding(12)
-        .style(style)
+    iced::widget::button::<
+        'a,
+        M,
+        Theme,
+        iced_renderer::fallback::Renderer<iced_wgpu::Renderer, iced_tiny_skia::Renderer>,
+    >(content)
+    .padding(12)
+    .style(style)
 }
