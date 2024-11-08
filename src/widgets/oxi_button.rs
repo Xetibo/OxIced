@@ -3,7 +3,6 @@ use iced::{
     widget::button::{Status, Style},
     Border, Element, Renderer, Shadow, Theme, Vector,
 };
-use iced_widget::button::StyleFn;
 
 use super::common::{lighten_color, StylingCategory};
 
@@ -90,7 +89,7 @@ where
     //T::Class<'a>: From<StyleFn<'a, T>>,
     //T: iced_widget::button::Catalog + 'a,
     //&'aT: Into<&Theme>,
-    Renderer: iced_core::Renderer,
+    Renderer: iced::advanced::Renderer,
 {
     let style = match variant {
         ButtonVariant::Primary => primary_button,
