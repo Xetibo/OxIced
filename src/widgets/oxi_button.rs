@@ -81,10 +81,13 @@ fn danger_button(theme: &Theme, status: Status) -> Style {
     states(status, base, &palette.danger)
 }
 
-pub fn button<'a, M>(
-    content: impl Into<Element<'a, M, Theme>>,
+pub fn button<'a, M, T, R>(
+    content: impl Into<Element<'a, M, Theme, R>>,
     variant: ButtonVariant,
-) -> iced::widget::Button<'a, M> {
+) -> iced::widget::Button<'a, M, Theme, R>
+where
+    R: iced::advanced::Renderer,
+{
     let style = match variant {
         ButtonVariant::Primary => primary_button,
         ButtonVariant::Secondary => secondary_button,
