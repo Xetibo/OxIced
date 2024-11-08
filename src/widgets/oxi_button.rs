@@ -84,19 +84,12 @@ fn danger_button(theme: &Theme, status: Status) -> Style {
 pub fn button<'a, M>(
     content: impl Into<Element<'a, M, Theme>>,
     variant: ButtonVariant,
-) -> iced::widget::Button<'a, M, Theme> {
+) -> iced::widget::Button<'a, M> {
     let style = match variant {
         ButtonVariant::Primary => primary_button,
         ButtonVariant::Secondary => secondary_button,
         ButtonVariant::Success => success_button,
         ButtonVariant::Danger => danger_button,
     };
-    iced::widget::button::<
-        'a,
-        M,
-        Theme,
-        iced_renderer::fallback::Renderer<iced_wgpu::Renderer, iced_tiny_skia::Renderer>,
-    >(content)
-    .padding(12)
-    .style(style)
+    iced::widget::button(content).padding(12).style(style)
 }
