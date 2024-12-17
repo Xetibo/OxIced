@@ -1,7 +1,5 @@
-use iced::{
-    theme::palette::{Danger, Pair, Primary, Secondary, Success},
-    Color,
-};
+use iced_core::Color;
+use iced_widget::theme::palette::{Danger, Pair, Primary, Secondary, Success};
 
 pub trait StylingCategory {
     fn base(&self) -> Pair;

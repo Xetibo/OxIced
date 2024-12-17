@@ -1,9 +1,7 @@
-use iced::{
-    widget::{
-        slider::{Handle, HandleShape, Rail, Status, Style},
-        Slider,
-    },
-    Theme,
+use iced_core::Theme;
+use iced_widget::{
+    slider::{Handle, HandleShape, Rail, Status, Style},
+    Slider,
 };
 
 pub fn slider_style(theme: &Theme, status: Status) -> Style {
@@ -11,8 +9,8 @@ pub fn slider_style(theme: &Theme, status: Status) -> Style {
     let style = Style {
         rail: Rail {
             backgrounds: (
-                iced::Background::Color(palette.primary.base.color),
-                iced::Background::Color(palette.background.weak.color),
+                iced_core::Background::Color(palette.primary.base.color),
+                iced_core::Background::Color(palette.background.weak.color),
             ),
             width: 20.0,
             // TODO
@@ -22,7 +20,7 @@ pub fn slider_style(theme: &Theme, status: Status) -> Style {
             shape: HandleShape::Circle { radius: 8.0 },
             border_width: 2.0,
             border_color: palette.primary.base.text,
-            background: iced::Background::Color(palette.primary.base.text),
+            background: iced_core::Background::Color(palette.primary.base.text),
         },
     };
     match status {
@@ -41,5 +39,5 @@ where
     V: Copy + From<u8> + std::cmp::PartialOrd,
     M: Clone,
 {
-    iced::widget::slider(range, value, on_change).style(slider_style)
+    iced_widget::slider(range, value, on_change).style(slider_style)
 }

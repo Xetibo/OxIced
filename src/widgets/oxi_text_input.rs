@@ -1,15 +1,12 @@
-use iced::{
-    border::Radius,
-    widget::text_input::{Status, Style},
-    Border, Theme,
-};
+use iced_core::{border::Radius, Border, Theme};
+use iced_widget::text_input::{Status, Style};
 
 use super::common::darken_color;
 
 pub fn text_input_style(theme: &Theme, status: Status) -> Style {
     let palette = theme.extended_palette();
     let mut style = Style {
-        background: iced::Background::Color(palette.background.weak.color),
+        background: iced_core::Background::Color(palette.background.weak.color),
         border: Border {
             color: palette.background.strong.color,
             width: 0.0,
@@ -24,19 +21,20 @@ pub fn text_input_style(theme: &Theme, status: Status) -> Style {
         Status::Active => style,
         Status::Hovered => {
             // TODO: really? double darken
-            style.background = iced::Background::Color(darken_color(darken_color(
+            style.background = iced_core::Background::Color(darken_color(darken_color(
                 palette.background.strong.color,
             )));
             style
         }
-        Status::Focused => {
-            style.background = iced::Background::Color(darken_color(darken_color(
+        // TODO
+        Status::Focused { is_hovered } => {
+            style.background = iced_core::Background::Color(darken_color(darken_color(
                 palette.background.strong.color,
             )));
             style
         }
         Status::Disabled => {
-            style.background = iced::Background::Color(palette.background.base.color);
+            style.background = iced_core::Background::Color(palette.background.base.color);
             style
         }
     }
@@ -46,11 +44,11 @@ pub fn text_input<'a, M>(
     placeholder: &str,
     value: &str,
     on_text_changed: impl Fn(String) -> M + 'a,
-) -> iced::widget::TextInput<'a, M>
+) -> iced_widget::TextInput<'a, M>
 where
     M: Clone,
 {
-    iced::widget::text_input(placeholder, value)
+    iced_widget::text_input(placeholder, value)
         .padding(10)
         .on_input(on_text_changed)
         .style(text_input_style)

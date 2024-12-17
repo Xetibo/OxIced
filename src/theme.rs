@@ -1,6 +1,6 @@
 use std::{fs::File, io::Read};
 
-use iced::{
+use iced_core::{
     color,
     theme::{
         palette::{Background, Danger, Extended, Pair, Primary, Secondary, Success},

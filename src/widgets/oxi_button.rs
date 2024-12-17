@@ -1,7 +1,7 @@
-use iced::{
-    border::Radius,
-    widget::button::{Status, Style},
-    Border, Element, Shadow, Theme, Vector,
+use iced_core::{border::Radius, Border, Element, Renderer, Shadow, Vector};
+use iced_widget::{
+    button::{Status, Style},
+    Theme,
 };
 
 use super::common::{lighten_color, StylingCategory};
@@ -15,10 +15,10 @@ pub enum ButtonVariant {
 
 fn styled(palette: &impl StylingCategory) -> Style {
     Style {
-        background: Some(iced::Background::Color(palette.base().color)),
+        background: Some(iced_core::Background::Color(palette.base().color)),
         text_color: palette.base().text,
         border: Border {
-            color: iced::Color::TRANSPARENT,
+            color: iced_core::Color::TRANSPARENT,
             width: 0.0,
             radius: Radius::from(10),
         },
@@ -44,13 +44,15 @@ fn states(status: Status, base: Style, palette: &impl StylingCategory) -> Style 
     match status {
         Status::Active => base,
         Status::Pressed => Style {
-            background: Some(iced::Background::Color(lighten_color(
+            background: Some(iced_core::Background::Color(lighten_color(
                 palette.strong().color,
             ))),
             ..base
         },
         Status::Hovered => Style {
-            background: Some(iced::Background::Color(lighten_color(palette.base().color))),
+            background: Some(iced_core::Background::Color(lighten_color(
+                palette.base().color,
+            ))),
             ..base
         },
         Status::Disabled => disabled(base),
@@ -81,15 +83,20 @@ fn danger_button(theme: &Theme, status: Status) -> Style {
     states(status, base, &palette.danger)
 }
 
-pub fn button<'a, M>(
-    content: impl Into<Element<'a, M>>,
+pub fn button<'a, M, T, R>(
+    content: impl Into<Element<'a, M, Theme, R>>,
     variant: ButtonVariant,
-) -> iced::widget::Button<'a, M> {
+) -> iced_widget::Button<'a, M, Theme, R>
+where
+    R: Renderer,
+{
     let style = match variant {
         ButtonVariant::Primary => primary_button,
         ButtonVariant::Secondary => secondary_button,
         ButtonVariant::Success => success_button,
         ButtonVariant::Danger => danger_button,
     };
-    iced::widget::button(content).padding(12).style(style)
+    iced_widget::button::<'a, M, Theme, R>(content)
+        .padding(12)
+        .style(style)
 }

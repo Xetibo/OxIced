@@ -1,10 +1,8 @@
-use iced::{
-    widget::{
-        text::LineHeight,
-        toggler::{Status, Style},
-        Toggler,
-    },
-    Theme,
+use iced_core::Theme;
+use iced_widget::{
+    text::LineHeight,
+    toggler::{Status, Style},
+    Toggler,
 };
 
 pub fn toggler_style(theme: &Theme, status: Status) -> Style {
@@ -33,7 +31,7 @@ pub fn toggler_style(theme: &Theme, status: Status) -> Style {
 
 pub fn toggler<'a, M>(is_checked: bool) -> Toggler<'a, M> {
     // TODO label and on toggle
-    iced::widget::toggler(is_checked)
+    iced_widget::toggler(is_checked)
         .text_line_height(LineHeight::Relative(4.0))
         .size(30)
         .style(toggler_style)

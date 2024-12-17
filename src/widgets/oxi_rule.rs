@@ -1,10 +1,7 @@
-use iced::{
-    border::Radius,
-    widget::{
-        rule::{FillMode, Style},
-        Rule,
-    },
-    Pixels, Theme,
+use iced_core::{border::Radius, Pixels, Theme};
+use iced_widget::{
+    rule::{FillMode, Style},
+    Rule,
 };
 
 pub fn rule_style(theme: &Theme) -> Style {
@@ -18,9 +15,9 @@ pub fn rule_style(theme: &Theme) -> Style {
 }
 
 pub fn vertical_rule<'a>(width: impl Into<Pixels>) -> Rule<'a> {
-    iced::widget::vertical_rule(width).style(rule_style)
+    iced_widget::vertical_rule(width).style(rule_style)
 }
 
 pub fn horizontal_rule<'a>(width: impl Into<Pixels>) -> Rule<'a> {
-    iced::widget::horizontal_rule(width).style(rule_style)
+    iced_widget::horizontal_rule(width).style(rule_style)
 }

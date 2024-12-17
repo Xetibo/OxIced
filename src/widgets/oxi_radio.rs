@@ -1,16 +1,14 @@
-use iced::{
-    widget::{
-        radio::{Status, Style},
-        text::LineHeight,
-        Radio,
-    },
-    Theme,
+use iced_core::Theme;
+use iced_widget::{
+    radio::{Status, Style},
+    text::LineHeight,
+    Radio,
 };
 
 pub fn radio_style(theme: &Theme, status: Status) -> Style {
     let palette = theme.extended_palette();
     let mut style = Style {
-        background: iced::Background::Color(palette.primary.base.color),
+        background: iced_core::Background::Color(palette.primary.base.color),
         text_color: Some(palette.background.base.text),
         dot_color: palette.background.base.text,
         border_width: 1.0,
@@ -19,7 +17,7 @@ pub fn radio_style(theme: &Theme, status: Status) -> Style {
     match status {
         Status::Active { is_selected: _ } => style,
         Status::Hovered { is_selected: _ } => {
-            style.background = iced::Background::Color(palette.primary.strong.color);
+            style.background = iced_core::Background::Color(palette.primary.strong.color);
             style
         }
     }
@@ -35,7 +33,7 @@ where
     V: Copy + Eq,
     M: Clone,
 {
-    iced::widget::radio(label, value, selected, on_click)
+    iced_widget::radio(label, value, selected, on_click)
         .size(20)
         .spacing(10)
         .style(radio_style)

@@ -7,10 +7,16 @@ license = "LGPL-3.0-or-later"
 
 [dependencies]
 arboard = "3.4.1"
-iced = { version = "0.13", features = ["advanced", "canvas"] }
-iced_layershell = "0.7.1"
-once_cell = "1.19.0"
-serde = "1.0.204"
-toml = "0.8.14"
+iced_core = { git = "https://github.com/Azorlogh/iced", rev = "47af5890d8cf80b8bfd5909eee1ef3b1d5c05421" }
+iced_runtime = { git = "https://github.com/Azorlogh/iced", rev = "47af5890d8cf80b8bfd5909eee1ef3b1d5c05421" }
+iced_wgpu = { git = "https://github.com/Azorlogh/iced", rev = "47af5890d8cf80b8bfd5909eee1ef3b1d5c05421" }
+iced_widget = { git = "https://github.com/Azorlogh/iced", rev = "47af5890d8cf80b8bfd5909eee1ef3b1d5c05421" }
+iced_renderer = { git = "https://github.com/Azorlogh/iced", features = [
+	"wgpu",
+], rev = "47af5890d8cf80b8bfd5909eee1ef3b1d5c05421" }
+iced_layershell = "0.9.0"
+once_cell = "1.20"
+serde = "1.0"
+toml = "0.8"
 xdg = "2.5.2"
-zbus = "4.4.0"
+zbus = "5.2.0"
