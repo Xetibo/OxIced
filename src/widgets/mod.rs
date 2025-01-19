@@ -6,5 +6,6 @@ pub mod oxi_progress;
 pub mod oxi_radio;
 pub mod oxi_rule;
 pub mod oxi_slider;
+pub mod oxi_svg;
 pub mod oxi_text_input;
 pub mod oxi_toggler;
