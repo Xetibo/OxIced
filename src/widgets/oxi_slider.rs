@@ -1,9 +1,10 @@
 use iced::{
+    border::Radius,
     widget::{
         slider::{Handle, HandleShape, Rail, Status, Style},
         Slider,
     },
-    Theme,
+    Border, Color, Theme,
 };
 
 pub fn slider_style(theme: &Theme, status: Status) -> Style {
@@ -14,9 +15,12 @@ pub fn slider_style(theme: &Theme, status: Status) -> Style {
                 iced::Background::Color(palette.primary.base.color),
                 iced::Background::Color(palette.background.weak.color),
             ),
-            width: 20.0,
-            // TODO
-            border: Default::default(),
+            width: 8.0,
+            border: Border {
+                color: Color::from_rgba(0.0, 0.0, 0.0, 0.0),
+                width: 0.0,
+                radius: Radius::new(8.0),
+            },
         },
         handle: Handle {
             shape: HandleShape::Circle { radius: 8.0 },
