@@ -11,6 +11,8 @@ pub enum ButtonVariant {
     Secondary,
     Success,
     Danger,
+    LeftMenuEntry,
+    RowEntry,
 }
 
 fn styled(palette: &impl StylingCategory) -> Style {
@@ -63,6 +65,12 @@ fn primary_button(theme: &Theme, status: Status) -> Style {
     states(status, base, &palette.primary)
 }
 
+fn left_menu_entry(theme: &Theme, status: Status) -> Style {
+    let palette = theme.extended_palette();
+    let base = styled(&palette.background);
+    states(status, base, &palette.background)
+}
+
 fn secondary_button(theme: &Theme, status: Status) -> Style {
     let palette = theme.extended_palette();
     let base = styled(&palette.secondary);
@@ -90,6 +98,7 @@ pub fn button<'a, M>(
         ButtonVariant::Secondary => secondary_button,
         ButtonVariant::Success => success_button,
         ButtonVariant::Danger => danger_button,
+        ButtonVariant::LeftMenuEntry | ButtonVariant::RowEntry => left_menu_entry,
     };
     iced::widget::button(content).padding(12).style(style)
 }
