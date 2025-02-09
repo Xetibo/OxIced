@@ -2,6 +2,7 @@ use std::borrow::Borrow;
 
 use iced::{
     border::Radius,
+    color,
     overlay::menu,
     widget::{self, PickList},
     Border, Theme,
@@ -18,7 +19,7 @@ pub fn picklist_style(
         background: iced::Background::Color(palette.background.weak.color),
         text_color: palette.background.base.text,
         border: Border {
-            color: palette.background.weak.color,
+            color: palette.background.strong.color,
             width: 0.0,
             radius: Radius::from(10),
         },
@@ -47,8 +48,8 @@ pub fn menu_style(theme: &Theme) -> menu::Style {
         background: iced::Background::Color(palette.background.weak.color),
         text_color: palette.background.base.text,
         border: Border {
-            color: palette.background.strong.color,
-            width: 0.0,
+            color: color!(0x89B4FA),
+            width: 2.0,
             // TODO this should be dependend on the index
             radius: Radius::from(10),
         },
