@@ -59,31 +59,31 @@ fn states(status: Status, base: Style, palette: &impl StylingCategory) -> Style 
     }
 }
 
-fn primary_button(theme: &Theme, status: Status) -> Style {
+pub fn primary_button(theme: &Theme, status: Status) -> Style {
     let palette = theme.extended_palette();
     let base = styled(&palette.primary);
     states(status, base, &palette.primary)
 }
 
-fn left_menu_entry(theme: &Theme, status: Status) -> Style {
+pub fn left_menu_entry(theme: &Theme, status: Status) -> Style {
     let palette = theme.extended_palette();
     let base = styled(&palette.background);
     states(status, base, &palette.background)
 }
 
-fn secondary_button(theme: &Theme, status: Status) -> Style {
+pub fn secondary_button(theme: &Theme, status: Status) -> Style {
     let palette = theme.extended_palette();
     let base = styled(&palette.secondary);
     states(status, base, &palette.secondary)
 }
 
-fn success_button(theme: &Theme, status: Status) -> Style {
+pub fn success_button(theme: &Theme, status: Status) -> Style {
     let palette = theme.extended_palette();
     let base = styled(&palette.success);
     states(status, base, &palette.success)
 }
 
-fn danger_button(theme: &Theme, status: Status) -> Style {
+pub fn danger_button(theme: &Theme, status: Status) -> Style {
     let palette = theme.extended_palette();
     let base = styled(&palette.danger);
     states(status, base, &palette.danger)
