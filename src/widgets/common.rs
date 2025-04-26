@@ -1,5 +1,5 @@
 use iced::{
-    theme::palette::{Danger, Pair, Primary, Secondary, Success},
+    theme::palette::{Background, Danger, Pair, Primary, Secondary, Success},
     Color,
 };
 
@@ -7,6 +7,20 @@ pub trait StylingCategory {
     fn base(&self) -> Pair;
     fn weak(&self) -> Pair;
     fn strong(&self) -> Pair;
+}
+
+impl StylingCategory for Background {
+    fn base(&self) -> Pair {
+        self.base
+    }
+
+    fn weak(&self) -> Pair {
+        self.weak
+    }
+
+    fn strong(&self) -> Pair {
+        self.strong
+    }
 }
 
 impl StylingCategory for Primary {

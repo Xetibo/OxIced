@@ -2,12 +2,13 @@ use std::borrow::Borrow;
 
 use iced::{
     border::Radius,
+    color,
     overlay::menu,
     widget::{self, PickList},
     Border, Theme,
 };
 
-use super::common::darken_color;
+use super::common::{darken_color, lighten_color};
 
 pub fn picklist_style(
     theme: &Theme,
@@ -18,7 +19,7 @@ pub fn picklist_style(
         background: iced::Background::Color(palette.background.weak.color),
         text_color: palette.background.base.text,
         border: Border {
-            color: palette.background.weak.color,
+            color: palette.background.strong.color,
             width: 0.0,
             radius: Radius::from(10),
         },
@@ -29,12 +30,13 @@ pub fn picklist_style(
         widget::pick_list::Status::Active => style,
         widget::pick_list::Status::Hovered => {
             style.background =
-                iced::Background::Color(darken_color(palette.background.strong.color));
+                iced::Background::Color(lighten_color(palette.background.weak.color));
             style
         }
         widget::pick_list::Status::Opened => {
-            style.background =
-                iced::Background::Color(darken_color(palette.background.strong.color));
+            // TODO either same as hovered or same as normal
+            // style.background =
+            //     iced::Background::Color(darken_color(palette.background.strong.color));
             style
         }
     }
@@ -46,8 +48,9 @@ pub fn menu_style(theme: &Theme) -> menu::Style {
         background: iced::Background::Color(palette.background.weak.color),
         text_color: palette.background.base.text,
         border: Border {
-            color: palette.background.strong.color,
-            width: 0.0,
+            color: color!(0x89B4FA),
+            width: 2.0,
+            // TODO this should be dependend on the index
             radius: Radius::from(10),
         },
         selected_text_color: palette.background.base.text,
