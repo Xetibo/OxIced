@@ -1,5 +1,6 @@
 use iced::{
     border::Radius,
+    color,
     widget::{
         slider::{Handle, HandleShape, Rail, Status, Style},
         Slider,
@@ -12,8 +13,11 @@ pub fn slider_style(theme: &Theme, status: Status) -> Style {
     let style = Style {
         rail: Rail {
             backgrounds: (
-                iced::Background::Color(palette.primary.base.color),
-                iced::Background::Color(palette.background.weak.color),
+                // TODO generate base16 again
+                iced::Background::Color(color!(0x89B4FA)),
+                iced::Background::Color(color!(0x333444)),
+                //iced::Background::Color(palette.primary.base.color),
+                //iced::Background::Color(palette.background.weak.color),
             ),
             width: 8.0,
             border: Border {
