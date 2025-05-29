@@ -1,15 +1,14 @@
 use std::{fs::File, io::Read};
 
 use iced::{
-    color,
+    Theme, color,
     theme::{
-        palette::{Background, Danger, Extended, Pair, Primary, Secondary, Success},
         Palette,
+        palette::{Background, Danger, Extended, Pair, Primary, Secondary, Success},
     },
-    Theme,
 };
 use once_cell::sync::Lazy;
-use serde::{de::DeserializeOwned, Deserialize};
+use serde::{Deserialize, de::DeserializeOwned};
 
 use crate::widgets::common::{darken_color, lighten_color};
 
@@ -353,7 +352,7 @@ static THEME: Lazy<Theme> = Lazy::new(|| {
 });
 
 fn get_theme_toml() -> std::io::Result<String> {
-    let config = xdg::BaseDirectories::with_prefix("oxiced")?;
+    let config = xdg::BaseDirectories::with_prefix("oxiced");
     let theme_path = config.find_config_file("theme.toml");
     if theme_path.is_none() {
         return Err(std::io::Error::new(
