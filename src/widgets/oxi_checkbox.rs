@@ -1,35 +1,71 @@
 use iced::{
+    Border, Theme,
     border::Radius,
     widget::{
+        Checkbox,
         checkbox::{Status, Style},
         text::LineHeight,
-        Checkbox,
     },
-    Border, Theme,
 };
 
-pub fn checkbox_style(theme: &Theme, status: Status) -> Style {
-    let palette = theme.extended_palette();
+use crate::theme::theme::OXITHEME;
+
+pub fn checkbox_style(_: &Theme, status: Status) -> Style {
+    let palette = OXITHEME;
     let mut style = Style {
-        background: iced::Background::Color(palette.primary.base.color),
-        text_color: Some(palette.background.base.text),
+        background: iced::Background::Color(palette.tertiary_bg),
+        text_color: Some(palette.text),
         border: Border {
-            color: palette.primary.strong.color,
+            color: palette.border_color_weak,
             width: 1.0,
             radius: Radius::from(4),
         },
-        icon_color: palette.background.base.text,
+        icon_color: palette.text,
+    };
+    let mut checked_style = Style {
+        background: iced::Background::Color(palette.primary),
+        border: Border {
+            color: palette.primary_contrast,
+            ..style.border
+        },
+        icon_color: palette.primary_contrast,
+        ..style
     };
     match status {
-        Status::Active { is_checked: _ } => style,
-        Status::Hovered { is_checked: _ } => {
-            style.background = iced::Background::Color(palette.primary.strong.color);
-            style
-        }
-        Status::Disabled { is_checked: _ } => {
-            style.background = iced::Background::Color(palette.primary.weak.color);
-            style
-        }
+        Status::Active {
+            is_checked: checked,
+        } => match checked {
+            true => {
+                checked_style.background = iced::Background::Color(palette.primary_active);
+                checked_style
+            }
+            false => style,
+        },
+        Status::Hovered {
+            is_checked: checked,
+        } => match checked {
+            true => {
+                checked_style.background = iced::Background::Color(palette.primary_hover);
+                checked_style
+            }
+            false => {
+                style.background = iced::Background::Color(palette.tertiary_bg_hover);
+                style
+            }
+        },
+        Status::Disabled {
+            is_checked: checked,
+        } => match checked {
+            true => {
+                style.background = iced::Background::Color(palette.primary_bg);
+                style.icon_color = palette.secondary_bg;
+                style
+            }
+            false => {
+                style.background = iced::Background::Color(palette.primary_bg);
+                style
+            }
+        },
     }
 }
 
@@ -39,9 +75,9 @@ pub fn checkbox<'a, M>(
     user_on_toggle: impl Fn(bool) -> M + 'a,
 ) -> Checkbox<'a, M> {
     iced::widget::checkbox(label, is_checked)
-        .size(22)
-        .spacing(10)
-        .width(10)
+        .size(25)
+        .spacing(OXITHEME.padding_lg)
+        .width(OXITHEME.padding_lg)
         .style(checkbox_style)
         .text_line_height(LineHeight::Relative(2.0))
         .on_toggle(user_on_toggle)

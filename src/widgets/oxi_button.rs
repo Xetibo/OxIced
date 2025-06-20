@@ -1,18 +1,16 @@
 use iced::{
-    border::Radius,
-    color,
-    widget::button::{Status, Style},
     Border, Color, Element, Shadow, Theme, Vector,
+    border::Radius,
+    widget::button::{Status, Style},
 };
 
-use super::common::lighten_color;
+use crate::theme::theme::OXITHEME;
 
 pub enum ButtonVariant {
     Primary,
     Secondary,
     Success,
     Danger,
-    LeftMenuEntry,
     RowEntry,
 }
 
@@ -23,7 +21,7 @@ fn styled(background: Color, text: Color, shadow: Color) -> Style {
         border: Border {
             color: iced::Color::TRANSPARENT,
             width: 0.0,
-            radius: Radius::from(10),
+            radius: Radius::from(OXITHEME.border_radius),
         },
         shadow: Shadow {
             color: shadow,
@@ -47,62 +45,60 @@ fn states(status: Status, base: Style, pressed: Color, hovered: Color) -> Style 
     match status {
         Status::Active => base,
         Status::Pressed => Style {
-            background: Some(iced::Background::Color(lighten_color(pressed))),
+            background: Some(iced::Background::Color(pressed)),
             ..base
         },
         Status::Hovered => Style {
-            background: Some(iced::Background::Color(lighten_color(hovered))),
+            background: Some(iced::Background::Color(hovered)),
             ..base
         },
         Status::Disabled => disabled(base),
     }
 }
 
-pub fn primary_button(theme: &Theme, status: Status) -> Style {
-    let palette = theme.extended_palette().primary;
-    let base = styled(palette.base.color, palette.base.text, palette.weak.text);
-    states(status, base, palette.strong.color, palette.base.color)
+pub fn primary_button(_: &Theme, status: Status) -> Style {
+    let palette = OXITHEME;
+    let base = styled(palette.primary, palette.primary_contrast, palette.primary);
+    states(status, base, palette.primary_active, palette.primary_hover)
 }
 
-pub fn left_menu_entry(theme: &Theme, status: Status) -> Style {
-    let palette = theme.extended_palette();
+pub fn row_entry(_: &Theme, status: Status) -> Style {
+    let palette = OXITHEME;
+    let color = palette.primary_bg;
+    let base = styled(color, palette.text, color);
+    states(
+        status,
+        base,
+        palette.primary_bg_active,
+        palette.primary_bg_hover,
+    )
+}
+
+pub fn secondary_button(_: &Theme, status: Status) -> Style {
+    let palette = OXITHEME;
     let base = styled(
-        palette.background.base.color,
-        palette.background.base.text,
-        palette.background.weak.color,
+        palette.secondary,
+        palette.secondary_contrast,
+        palette.secondary,
     );
     states(
         status,
         base,
-        palette.primary.strong.color,
-        palette.primary.base.color,
+        palette.secondary_active,
+        palette.secondary_hover,
     )
 }
 
-// TODO beforepr
-pub fn row_entry(theme: &Theme, status: Status) -> Style {
-    let palette = theme.extended_palette();
-    let color = color!(0x181825);
-    let base = styled(color, palette.primary.base.text, palette.primary.weak.color);
-    states(status, base, color, color)
+pub fn success_button(_: &Theme, status: Status) -> Style {
+    let palette = OXITHEME;
+    let base = styled(palette.good, palette.good_contrast, palette.good);
+    states(status, base, palette.good_active, palette.good_hover)
 }
 
-pub fn secondary_button(theme: &Theme, status: Status) -> Style {
-    let palette = theme.extended_palette().secondary;
-    let base = styled(palette.base.color, palette.base.text, palette.weak.color);
-    states(status, base, palette.strong.color, palette.base.color)
-}
-
-pub fn success_button(theme: &Theme, status: Status) -> Style {
-    let palette = theme.extended_palette().success;
-    let base = styled(palette.base.color, palette.base.text, palette.weak.color);
-    states(status, base, palette.strong.color, palette.base.color)
-}
-
-pub fn danger_button(theme: &Theme, status: Status) -> Style {
-    let palette = theme.extended_palette().danger;
-    let base = styled(palette.base.color, palette.base.text, palette.weak.color);
-    states(status, base, palette.strong.color, palette.base.color)
+pub fn danger_button(_: &Theme, status: Status) -> Style {
+    let palette = OXITHEME;
+    let base = styled(palette.bad, palette.bad_contrast, palette.bad);
+    states(status, base, palette.bad_active, palette.bad_hover)
 }
 
 pub fn button<'a, M>(
@@ -114,8 +110,9 @@ pub fn button<'a, M>(
         ButtonVariant::Secondary => secondary_button,
         ButtonVariant::Success => success_button,
         ButtonVariant::Danger => danger_button,
-        ButtonVariant::LeftMenuEntry => left_menu_entry,
         ButtonVariant::RowEntry => row_entry,
     };
-    iced::widget::button(content).padding(12).style(style)
+    iced::widget::button(content)
+        .padding(OXITHEME.padding_md)
+        .style(style)
 }

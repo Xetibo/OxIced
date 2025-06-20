@@ -1,18 +1,20 @@
 use std::path::PathBuf;
 
-use iced::widget::svg::{Status, Style};
 use iced::Theme;
+use iced::widget::svg::{Status, Style};
+
+use crate::theme::theme::OXITHEME;
 
 pub enum SvgStyleVariant {
     Primary,
     Secondary,
 }
 
-pub fn svg_style(variant: &SvgStyleVariant, theme: &Theme, status: Status) -> Style {
-    let palette = theme.extended_palette();
+pub fn svg_style(variant: &SvgStyleVariant, _: &Theme, status: Status) -> Style {
+    let palette = OXITHEME;
     let color = match variant {
-        SvgStyleVariant::Primary => palette.primary.base.text,
-        SvgStyleVariant::Secondary => palette.secondary.base.text,
+        SvgStyleVariant::Primary => palette.primary,
+        SvgStyleVariant::Secondary => palette.secondary,
     };
     let style = Style { color: Some(color) };
     match status {

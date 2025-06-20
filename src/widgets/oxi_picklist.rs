@@ -1,60 +1,53 @@
 use std::borrow::Borrow;
 
 use iced::{
+    Border, Theme,
     border::Radius,
-    color,
     overlay::menu,
     widget::{self, PickList},
-    Border, Theme,
 };
 
-use super::common::{darken_color, lighten_color};
+use crate::theme::theme::OXITHEME;
 
-pub fn picklist_style(
-    theme: &Theme,
-    status: widget::pick_list::Status,
-) -> widget::pick_list::Style {
-    let palette = theme.extended_palette();
+pub fn picklist_style(_: &Theme, status: widget::pick_list::Status) -> widget::pick_list::Style {
+    let palette = OXITHEME;
     let mut style = widget::pick_list::Style {
-        background: iced::Background::Color(palette.background.weak.color),
-        text_color: palette.background.base.text,
+        background: iced::Background::Color(palette.primary_bg),
+        text_color: palette.text,
         border: Border {
-            color: palette.background.strong.color,
-            width: 0.0,
-            radius: Radius::from(10),
+            color: palette.primary_bg,
+            width: 1.0,
+            radius: Radius::from(palette.border_radius),
         },
-        placeholder_color: darken_color(palette.background.strong.color),
-        handle_color: darken_color(palette.background.strong.color),
+        placeholder_color: palette.text,
+        handle_color: palette.text,
     };
     match status {
         widget::pick_list::Status::Active => style,
         widget::pick_list::Status::Hovered => {
-            style.background =
-                iced::Background::Color(lighten_color(palette.background.weak.color));
+            style.background = iced::Background::Color(palette.primary_bg_hover);
             style
         }
         widget::pick_list::Status::Opened => {
-            // TODO either same as hovered or same as normal
-            // style.background =
-            //     iced::Background::Color(darken_color(palette.background.strong.color));
+            style.border.color = palette.primary;
             style
         }
     }
 }
 
-pub fn menu_style(theme: &Theme) -> menu::Style {
-    let palette = theme.extended_palette();
+pub fn menu_style(_: &Theme) -> menu::Style {
+    let palette = OXITHEME;
     menu::Style {
-        background: iced::Background::Color(palette.background.weak.color),
-        text_color: palette.background.base.text,
+        background: iced::Background::Color(palette.base),
+        text_color: palette.text,
         border: Border {
-            color: color!(0x89B4FA),
+            color: palette.primary,
             width: 2.0,
             // TODO this should be dependend on the index
-            radius: Radius::from(10),
+            radius: Radius::from(palette.border_radius),
         },
-        selected_text_color: palette.background.base.text,
-        selected_background: iced::Background::Color(darken_color(palette.background.strong.color)),
+        selected_text_color: palette.text,
+        selected_background: iced::Background::Color(palette.primary_bg_hover),
     }
 }
 
@@ -70,7 +63,7 @@ where
     M: Clone,
 {
     iced::widget::pick_list(options, selected, on_selected)
-        .padding(10)
+        .padding(OXITHEME.padding_lg)
         .style(picklist_style)
         .menu_style(menu_style)
 }

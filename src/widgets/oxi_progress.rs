@@ -1,19 +1,20 @@
 use iced::{
-    border::Radius,
-    widget::{progress_bar::Style, ProgressBar},
     Border, Theme,
+    border::Radius,
+    widget::{ProgressBar, progress_bar::Style},
 };
 
+use crate::theme::theme::OXITHEME;
 
-pub fn progress_style(theme: &Theme) -> Style {
-    let palette = theme.extended_palette();
+pub fn progress_style(_: &Theme) -> Style {
+    let palette = OXITHEME;
     Style {
-        background: iced::Background::Color(palette.background.weak.color),
-        bar: iced::Background::Color(palette.primary.base.color),
+        background: iced::Background::Color(palette.secondary_bg),
+        bar: iced::Background::Color(palette.primary),
         border: Border {
-            color: palette.background.base.text,
+            color: palette.border_color_weak,
             width: 0.0,
-            radius: Radius::from(10.0),
+            radius: Radius::from(palette.border_radius),
         },
     }
 }
