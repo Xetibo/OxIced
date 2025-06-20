@@ -1,16 +1,18 @@
 use iced::{
+    Pixels, Theme,
     border::Radius,
     widget::{
-        rule::{FillMode, Style},
         Rule,
+        rule::{FillMode, Style},
     },
-    Pixels, Theme,
 };
 
-pub fn rule_style(theme: &Theme) -> Style {
-    let palette = theme.extended_palette();
+use crate::theme::theme::OXITHEME;
+
+pub fn rule_style(_: &Theme) -> Style {
+    let palette = OXITHEME;
     Style {
-        color: palette.primary.strong.color,
+        color: palette.primary,
         width: 5,
         radius: Radius::from(2.0),
         fill_mode: FillMode::Percent(90.0),

@@ -1,5 +1,3 @@
-use std::{fs::File, io::Read};
-
 use iced::{
     Theme, color,
     theme::{
@@ -10,7 +8,13 @@ use iced::{
 use once_cell::sync::Lazy;
 use serde::{Deserialize, de::DeserializeOwned};
 
-use crate::widgets::common::{darken_color, lighten_color};
+use crate::{
+    theme::theme::OXITHEME,
+    utils::{
+        color::{darken_color, lighten_color},
+        file::get_theme_toml,
+    },
+};
 
 pub fn get_all_themes() -> Vec<Theme> {
     let current = get_theme().clone();
@@ -95,87 +99,228 @@ pub struct TomlBase16 {
     base0f: String, // Deprecated, Opening/Closing Embedded Language Tags, e.g. <?php ?>
 }
 
+pub struct ExtendedHex<'a> {
+    pub background_weak_color: &'a String,
+    pub background_base_color: &'a String,
+    pub background_strong_color: &'a String,
+    pub background_weak_text: &'a String,
+    pub background_base_text: &'a String,
+    pub background_strong_text: &'a String,
+
+    pub primary_weak_color: &'a String,
+    pub primary_base_color: &'a String,
+    pub primary_strong_color: &'a String,
+    pub primary_weak_text: &'a String,
+    pub primary_base_text: &'a String,
+    pub primary_strong_text: &'a String,
+
+    pub secondary_weak_color: &'a String,
+    pub secondary_base_color: &'a String,
+    pub secondary_strong_color: &'a String,
+    pub secondary_weak_text: &'a String,
+    pub secondary_base_text: &'a String,
+    pub secondary_strong_text: &'a String,
+
+    pub success_weak_color: &'a String,
+    pub success_base_color: &'a String,
+    pub success_strong_color: &'a String,
+    pub success_weak_text: &'a String,
+    pub success_base_text: &'a String,
+    pub success_strong_text: &'a String,
+
+    pub danger_weak_color: &'a String,
+    pub danger_base_color: &'a String,
+    pub danger_strong_color: &'a String,
+    pub danger_weak_text: &'a String,
+    pub danger_base_text: &'a String,
+    pub danger_strong_text: &'a String,
+}
+
+impl<'a> From<&'a TomlBase16> for ExtendedHex<'a> {
+    fn from(value: &'a TomlBase16) -> Self {
+        Self {
+            background_weak_color: &value.base00,
+            background_base_color: &value.base01,
+            background_strong_color: &value.base01,
+
+            background_weak_text: &value.base05,
+            background_base_text: &value.base05,
+            background_strong_text: &value.base05,
+
+            primary_weak_color: &value.base02,
+            primary_base_color: &value.base03,
+            primary_strong_color: &value.base04,
+
+            primary_weak_text: &value.base05,
+            primary_base_text: &value.base05,
+            primary_strong_text: &value.base05,
+
+            secondary_weak_color: &value.base02,
+            secondary_base_color: &value.base03,
+            secondary_strong_color: &value.base04,
+
+            secondary_weak_text: &value.base05,
+            secondary_base_text: &value.base05,
+            secondary_strong_text: &value.base05,
+
+            success_weak_color: &value.base06,
+            success_base_color: &value.base07,
+            success_strong_color: &value.base08,
+
+            success_weak_text: &value.base09,
+            success_base_text: &value.base0a,
+            success_strong_text: &value.base0b,
+
+            danger_weak_color: &value.base0c,
+            danger_base_color: &value.base0d,
+            danger_strong_color: &value.base0e,
+
+            danger_weak_text: &value.base0f,
+            // not used currently
+            danger_base_text: &value.base0f,
+            danger_strong_text: &value.base0f,
+        }
+    }
+}
+
 impl From<TomlBase16> for Extended {
     fn from(val: TomlBase16) -> Self {
+        let hex = ExtendedHex::from(&val);
         Extended {
             background: Background {
                 base: Pair {
-                    color: color!(u32::from_str_radix(&val.base00, 16).unwrap_or(0) as f32),
-                    text: color!(u32::from_str_radix(&val.base05, 16).unwrap_or(0) as f32),
+                    color: color!(
+                        u32::from_str_radix(&hex.background_base_color, 16).unwrap_or(0) as f32
+                    ),
+                    text: color!(
+                        u32::from_str_radix(&hex.background_base_text, 16).unwrap_or(0) as f32
+                    ),
                 },
                 weak: Pair {
-                    color: color!(u32::from_str_radix(&val.base01, 16).unwrap_or(0) as f32),
-                    text: color!(u32::from_str_radix(&val.base03, 16).unwrap_or(0) as f32),
+                    color: color!(
+                        u32::from_str_radix(&hex.background_weak_color, 16).unwrap_or(0) as f32
+                    ),
+                    text: color!(
+                        u32::from_str_radix(&hex.background_weak_text, 16).unwrap_or(0) as f32
+                    ),
                 },
                 strong: Pair {
-                    color: color!(u32::from_str_radix(&val.base02, 16).unwrap_or(0) as f32),
-                    text: color!(u32::from_str_radix(&val.base04, 16).unwrap_or(0) as f32),
+                    color: color!(
+                        u32::from_str_radix(&hex.background_strong_color, 16).unwrap_or(0) as f32
+                    ),
+                    text: color!(
+                        u32::from_str_radix(&hex.background_strong_text, 16).unwrap_or(0) as f32
+                    ),
                 },
             },
             primary: Primary {
                 base: Pair {
-                    color: lighten_color(color!(
-                        u32::from_str_radix(&val.base00, 16).unwrap_or(0) as f32
-                    )),
-                    text: color!(u32::from_str_radix(&val.base05, 16).unwrap_or(0) as f32),
+                    color: color!(
+                        u32::from_str_radix(&hex.primary_base_color, 16).unwrap_or(0) as f32
+                    ),
+                    text: color!(
+                        u32::from_str_radix(&hex.primary_base_text, 16).unwrap_or(0) as f32
+                    ),
                 },
                 weak: Pair {
-                    color: color!(u32::from_str_radix(&val.base02, 16).unwrap_or(0) as f32),
-                    text: color!(u32::from_str_radix(&val.base03, 16).unwrap_or(0) as f32),
+                    color: color!(
+                        u32::from_str_radix(&hex.primary_weak_color, 16).unwrap_or(0) as f32
+                    ),
+                    text: color!(
+                        u32::from_str_radix(&hex.primary_weak_text, 16).unwrap_or(0) as f32
+                    ),
                 },
                 strong: Pair {
-                    color: color!(u32::from_str_radix(&val.base04, 16).unwrap_or(0) as f32),
-                    text: color!(u32::from_str_radix(&val.base04, 16).unwrap_or(0) as f32),
+                    color: color!(
+                        u32::from_str_radix(&hex.primary_strong_color, 16).unwrap_or(0) as f32
+                    ),
+                    text: color!(
+                        u32::from_str_radix(&hex.primary_strong_text, 16).unwrap_or(0) as f32
+                    ),
                 },
             },
             secondary: Secondary {
                 base: Pair {
-                    color: color!(u32::from_str_radix(&val.base03, 16).unwrap_or(0) as f32),
-                    text: color!(u32::from_str_radix(&val.base05, 16).unwrap_or(0) as f32),
+                    color: color!(
+                        u32::from_str_radix(&hex.secondary_base_color, 16).unwrap_or(0) as f32
+                    ),
+                    text: color!(
+                        u32::from_str_radix(&hex.secondary_base_text, 16).unwrap_or(0) as f32
+                    ),
                 },
                 weak: Pair {
-                    color: color!(u32::from_str_radix(&val.base02, 16).unwrap_or(0) as f32),
-                    text: color!(u32::from_str_radix(&val.base06, 16).unwrap_or(0) as f32),
+                    color: color!(
+                        u32::from_str_radix(&hex.secondary_weak_color, 16).unwrap_or(0) as f32
+                    ),
+                    text: color!(
+                        u32::from_str_radix(&hex.secondary_weak_text, 16).unwrap_or(0) as f32
+                    ),
                 },
                 strong: Pair {
-                    color: color!(u32::from_str_radix(&val.base04, 16).unwrap_or(0) as f32),
-                    text: color!(u32::from_str_radix(&val.base04, 16).unwrap_or(0) as f32),
+                    color: color!(
+                        u32::from_str_radix(&hex.secondary_strong_color, 16).unwrap_or(0) as f32
+                    ),
+                    text: color!(
+                        u32::from_str_radix(&hex.secondary_strong_text, 16).unwrap_or(0) as f32
+                    ),
                 },
             },
             success: Success {
                 base: Pair {
-                    color: color!(u32::from_str_radix(&val.base0b, 16).unwrap_or(0) as f32),
-                    text: color!(u32::from_str_radix(&val.base01, 16).unwrap_or(0) as f32),
+                    color: color!(
+                        u32::from_str_radix(&hex.success_base_color, 16).unwrap_or(0) as f32
+                    ),
+                    text: color!(
+                        u32::from_str_radix(&hex.success_base_text, 16).unwrap_or(0) as f32
+                    ),
                 },
                 weak: Pair {
-                    color: darken_color(color!(
-                        u32::from_str_radix(&val.base0b, 16).unwrap_or(0) as f32
-                    )),
-                    text: color!(u32::from_str_radix(&val.base01, 16).unwrap_or(0) as f32),
+                    color: darken_color(
+                        &color!(
+                            u32::from_str_radix(&hex.success_weak_color, 16).unwrap_or(0) as f32
+                        ),
+                        OXITHEME.tint_amount,
+                    ),
+                    text: color!(
+                        u32::from_str_radix(&hex.success_weak_text, 16).unwrap_or(0) as f32
+                    ),
                 },
                 strong: Pair {
-                    color: lighten_color(color!(
-                        u32::from_str_radix(&val.base0b, 16).unwrap_or(0) as f32
-                    )),
-                    text: color!(u32::from_str_radix(&val.base01, 16).unwrap_or(0) as f32),
+                    color: lighten_color(
+                        &color!(
+                            u32::from_str_radix(&hex.success_strong_color, 16).unwrap_or(0) as f32
+                        ),
+                        OXITHEME.tint_amount,
+                    ),
+                    text: color!(
+                        u32::from_str_radix(&hex.success_strong_text, 16).unwrap_or(0) as f32
+                    ),
                 },
             },
             danger: Danger {
                 base: Pair {
-                    color: color!(u32::from_str_radix(&val.base08, 16).unwrap_or(0) as f32),
-                    text: color!(u32::from_str_radix(&val.base01, 16).unwrap_or(0) as f32),
+                    color: color!(
+                        u32::from_str_radix(&hex.danger_base_color, 16).unwrap_or(0) as f32
+                    ),
+                    text: color!(u32::from_str_radix(&hex.danger_base_text, 16).unwrap_or(0) as f32),
                 },
                 weak: Pair {
-                    color: darken_color(color!(
-                        u32::from_str_radix(&val.base08, 16).unwrap_or(0) as f32
-                    )),
-                    text: color!(u32::from_str_radix(&val.base01, 16).unwrap_or(0) as f32),
+                    color: darken_color(
+                        &color!(u32::from_str_radix(&hex.danger_weak_color, 16).unwrap_or(0) as f32),
+                        OXITHEME.tint_amount,
+                    ),
+                    text: color!(u32::from_str_radix(&hex.danger_weak_text, 16).unwrap_or(0) as f32),
                 },
                 strong: Pair {
-                    color: lighten_color(color!(
-                        u32::from_str_radix(&val.base08, 16).unwrap_or(0) as f32
-                    )),
-                    text: color!(u32::from_str_radix(&val.base01, 16).unwrap_or(0) as f32),
+                    color: lighten_color(
+                        &color!(
+                            u32::from_str_radix(&hex.danger_strong_color, 16).unwrap_or(0) as f32
+                        ),
+                        OXITHEME.tint_amount,
+                    ),
+                    text: color!(
+                        u32::from_str_radix(&hex.danger_strong_text, 16).unwrap_or(0) as f32
+                    ),
                 },
             },
             is_dark: true,
@@ -333,15 +478,15 @@ static THEME: Lazy<Theme> = Lazy::new(|| {
     }
     let theme_string = theme_string.unwrap();
     let base16_theme = parse_extended_palette::<TomlBase16>(&theme_string);
-    if let Some(theme) = base16_theme {
+    if let Ok(theme) = base16_theme {
         return theme;
     }
     let theme = parse_simple_palette(&theme_string);
-    if let Some(theme) = theme {
+    if let Ok(theme) = theme {
         return theme;
     }
     let extended_theme = parse_extended_palette::<TomlExtended>(&theme_string);
-    if let Some(theme) = extended_theme {
+    if let Ok(theme) = extended_theme {
         return theme;
     }
     Theme::custom_with_fn(
@@ -351,44 +496,19 @@ static THEME: Lazy<Theme> = Lazy::new(|| {
     )
 });
 
-fn get_theme_toml() -> std::io::Result<String> {
-    let config = xdg::BaseDirectories::with_prefix("oxiced");
-    let theme_path = config.find_config_file("theme.toml");
-    if theme_path.is_none() {
-        return Err(std::io::Error::new(
-            std::io::ErrorKind::NotFound,
-            "file not found",
-        ));
-    }
-    let theme_path = theme_path.unwrap();
-    let mut theme_file = File::open(theme_path)?;
-    let mut theme_string = String::from("");
-    theme_file.read_to_string(&mut theme_string)?;
-    Ok(theme_string)
-}
-
-fn parse_simple_palette(theme_string: &str) -> Option<Theme> {
-    let parsed_theme: Result<TomlSimple, _> = toml::from_str(theme_string);
-    if parsed_theme.is_err() {
-        return None;
-    }
-    let parsed_theme = parsed_theme.unwrap();
-    Some(Theme::custom(
+fn parse_simple_palette(theme_string: &str) -> Result<Theme, toml::de::Error> {
+    let parsed_theme: TomlSimple = toml::from_str(theme_string)?;
+    Ok(Theme::custom(
         parsed_theme.name.clone(),
         parsed_theme.into(),
     ))
 }
 
-fn parse_extended_palette<T: DeserializeOwned + TomlTheme + Into<Extended>>(
+pub fn parse_extended_palette<T: DeserializeOwned + TomlTheme + Into<Extended>>(
     theme_string: &str,
-) -> Option<Theme> {
-    let parsed_theme: Result<T, _> = toml::from_str(theme_string);
-    if let Err(error) = parsed_theme {
-        println!("Could not parse theme file: {}", error);
-        return None;
-    }
-    let parsed_theme = parsed_theme.unwrap();
-    Some(Theme::custom_with_fn(
+) -> Result<Theme, toml::de::Error> {
+    let parsed_theme: T = toml::from_str(theme_string)?;
+    Ok(Theme::custom_with_fn(
         parsed_theme.name(),
         TOKYO_NIGHT_DARK,
         |_: Palette| parsed_theme.into(),

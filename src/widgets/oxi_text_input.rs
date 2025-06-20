@@ -1,42 +1,39 @@
 use iced::{
+    Border, Theme,
     border::Radius,
     widget::text_input::{Status, Style},
-    Border, Theme,
 };
 
-use super::common::darken_color;
+use crate::theme::theme::OXITHEME;
 
-pub fn text_input_style(theme: &Theme, status: Status) -> Style {
-    let palette = theme.extended_palette();
+pub fn text_input_style(_: &Theme, status: Status) -> Style {
+    let palette = OXITHEME;
     let mut style = Style {
-        background: iced::Background::Color(palette.background.weak.color),
+        background: iced::Background::Color(palette.mantle),
         border: Border {
-            color: palette.background.strong.color,
-            width: 0.0,
-            radius: Radius::from(10),
+            color: palette.secondary_bg,
+            width: 1.0,
+            radius: Radius::from(palette.border_radius),
         },
-        icon: palette.background.base.text,
-        placeholder: palette.primary.weak.text,
-        value: palette.background.base.text,
-        selection: palette.primary.strong.color,
+        icon: palette.text,
+        placeholder: palette.text_muted,
+        value: palette.text,
+        selection: palette.primary,
     };
     match status {
         Status::Active => style,
         Status::Hovered => {
-            // TODO: really? double darken
-            style.background = iced::Background::Color(darken_color(darken_color(
-                palette.background.strong.color,
-            )));
+            style.background = iced::Background::Color(palette.mantle_hover);
+            style.border.color = palette.primary;
             style
         }
         Status::Focused => {
-            style.background = iced::Background::Color(darken_color(darken_color(
-                palette.background.strong.color,
-            )));
+            style.background = iced::Background::Color(palette.mantle);
+            style.border.color = palette.primary;
             style
         }
         Status::Disabled => {
-            style.background = iced::Background::Color(palette.background.base.color);
+            style.value = palette.text_muted;
             style
         }
     }
@@ -51,7 +48,7 @@ where
     M: Clone,
 {
     iced::widget::text_input(placeholder, value)
-        .padding(10)
+        .padding(OXITHEME.padding_lg)
         .on_input(on_text_changed)
         .style(text_input_style)
 }

@@ -1,36 +1,34 @@
 use iced::{
-    border::Radius,
-    color,
-    widget::{
-        slider::{Handle, HandleShape, Rail, Status, Style},
-        Slider,
-    },
     Border, Color, Theme,
+    border::Radius,
+    widget::{
+        Slider,
+        slider::{Handle, HandleShape, Rail, Status, Style},
+    },
 };
 
-pub fn slider_style(theme: &Theme, status: Status) -> Style {
-    let palette = theme.extended_palette();
+use crate::theme::theme::OXITHEME;
+
+pub fn slider_style(_: &Theme, status: Status) -> Style {
+    let palette = OXITHEME;
     let style = Style {
         rail: Rail {
             backgrounds: (
-                // TODO generate base16 again
-                iced::Background::Color(color!(0x89B4FA)),
-                iced::Background::Color(color!(0x333444)),
-                //iced::Background::Color(palette.primary.base.color),
-                //iced::Background::Color(palette.background.weak.color),
+                iced::Background::Color(palette.primary),
+                iced::Background::Color(palette.secondary_bg),
             ),
             width: 8.0,
             border: Border {
                 color: Color::from_rgba(0.0, 0.0, 0.0, 0.0),
                 width: 0.0,
-                radius: Radius::new(8.0),
+                radius: Radius::new(palette.border_radius),
             },
         },
         handle: Handle {
             shape: HandleShape::Circle { radius: 8.0 },
             border_width: 2.0,
-            border_color: palette.primary.base.text,
-            background: iced::Background::Color(palette.primary.base.text),
+            border_color: palette.text,
+            background: iced::Background::Color(palette.text),
         },
     };
     match status {
