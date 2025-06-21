@@ -1,5 +1,5 @@
 use iced::{
-    Border, Color, Element, Shadow, Theme, Vector,
+    Border, Color, Element, Length, Shadow, Theme, Vector,
     border::Radius,
     widget::button::{Status, Style},
 };
@@ -11,7 +11,7 @@ pub enum ButtonVariant {
     Secondary,
     Success,
     Danger,
-    RowEntry,
+    Neutral,
 }
 
 fn styled(background: Color, text: Color, shadow: Color) -> Style {
@@ -62,7 +62,7 @@ pub fn primary_button(_: &Theme, status: Status) -> Style {
     states(status, base, palette.primary_active, palette.primary_hover)
 }
 
-pub fn row_entry(_: &Theme, status: Status) -> Style {
+pub fn neutral_button(_: &Theme, status: Status) -> Style {
     let palette = OXITHEME;
     let color = palette.primary_bg;
     let base = styled(color, palette.text, color);
@@ -110,9 +110,16 @@ pub fn button<'a, M>(
         ButtonVariant::Secondary => secondary_button,
         ButtonVariant::Success => success_button,
         ButtonVariant::Danger => danger_button,
-        ButtonVariant::RowEntry => row_entry,
+        ButtonVariant::Neutral => neutral_button,
     };
     iced::widget::button(content)
         .padding(OXITHEME.padding_md)
         .style(style)
+}
+
+pub fn row_button<'a, M>(
+    content: impl Into<Element<'a, M>>,
+    variant: ButtonVariant,
+) -> iced::widget::Button<'a, M> {
+    button(content, variant).width(Length::Fill)
 }
