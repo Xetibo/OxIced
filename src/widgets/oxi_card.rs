@@ -5,9 +5,15 @@ use iced::{
     widget::{Row, column, container::Style, row, text},
 };
 
-use crate::{theme::theme::OXITHEME, widgets::oxi_icon::icon_widget};
+use crate::{
+    theme::theme::OXITHEME,
+    widgets::{
+        oxi_button::{self, ButtonVariant},
+        oxi_icon::icon_widget,
+    },
+};
 
-pub enum CardHeader<'a, T, I: ToString> {
+pub enum CardHeader<'a, T: Clone, I: ToString> {
     Title(String),
     TitleWithIcon {
         title: String,
@@ -20,10 +26,7 @@ pub enum CardHeader<'a, T, I: ToString> {
     Custom(Element<'a, T>),
 }
 
-impl<'a, T, I: ToString> CardHeader<'a, T, I>
-where
-    T: 'a,
-{
+impl<'a, T: Clone + 'a, I: ToString> CardHeader<'a, T, I> {
     fn mk_title(
         title: String,
         icon_opt: Option<I>,
@@ -55,29 +58,24 @@ where
     }
 }
 
-pub struct Card<'a, T, I: ToString> {
+pub struct Card<'a, T: Clone + 'a, I: ToString> {
     header: Option<CardHeader<'a, T, I>>,
     body: Element<'a, T>,
+    on_click: Option<fn() -> T>,
 }
 
-impl<'a, T> Card<'a, T, String>
-where
-    T: 'a,
-{
+impl<'a, T: Clone + 'a> Card<'a, T, String> {
     pub fn mk_title_card(title: String, body: Element<'a, T>) -> Element<'a, T> {
         Self {
             header: Some(CardHeader::Title(title)),
             body,
+            on_click: None,
         }
         .view()
     }
 }
 
-impl<'a, T, I: ToString> Card<'a, T, I>
-where
-    T: 'a,
-    I: 'a,
-{
+impl<'a, T: Clone + 'a, I: ToString + 'a> Card<'a, T, I> {
     fn style(_: &Theme) -> Style {
         let palette = OXITHEME;
 
@@ -88,8 +86,15 @@ where
         }
     }
 
+    fn clickable_card(
+        element: impl Into<Element<'a, T>>,
+        on_click: fn() -> T,
+    ) -> impl Into<Element<'a, T>> {
+        oxi_button::button(element, ButtonVariant::Neutral).on_press_with(on_click)
+    }
+
     fn view(self) -> Element<'a, T> {
-        iced::widget::container(
+        let card = iced::widget::container(
             column!(
                 self.header
                     .map(|value| value.mk_header())
@@ -103,7 +108,11 @@ where
         .padding(OXITHEME.padding_lg)
         .style(Self::style)
         .align_x(Horizontal::Center)
-        .align_y(Vertical::Center)
-        .into()
+        .align_y(Vertical::Center);
+        if let Some(click) = self.on_click {
+            Self::clickable_card(card, click).into()
+        } else {
+            card.into()
+        }
     }
 }

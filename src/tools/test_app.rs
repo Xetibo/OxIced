@@ -95,7 +95,7 @@ fn counter_box<'a>(state: &Counter) -> Column<'a, Message> {
         button("Decrement", ButtonVariant::Secondary).on_press(Message::Decrement(20)),
         button("success", ButtonVariant::Success).on_press(Message::Increment(10)),
         button("danger", ButtonVariant::Danger).on_press(Message::Increment(10)),
-        button("row", ButtonVariant::RowEntry).on_press(Message::Increment(10)),
+        button("row", ButtonVariant::Neutral).on_press(Message::Increment(10)),
         checkbox("what", state.is_checked, |_| { Message::Check() }),
         radio("first", 10, Some(state.value), Message::Set),
         radio("second", 20, Some(state.value), Message::Set),
@@ -105,12 +105,12 @@ fn counter_box<'a>(state: &Counter) -> Column<'a, Message> {
         // TODO broken
         toggler(state.is_toggled).on_toggle(Message::Toggle),
         progress_bar(0.0..=100.0, state.value as f32),
-        horizontal_rule(100),
-        vertical_rule(100),
         Card::mk_title_card(
             String::from("test"),
             text_input("something", state.text.as_str(), Message::TextChanged).into(),
-        )
+        ),
+        horizontal_rule(10),
+        vertical_rule(10),
     ]
     .padding(20)
     .align_x(Alignment::Center)
