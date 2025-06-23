@@ -9,12 +9,12 @@ use crate::widgets::oxi_radio::radio;
 use crate::widgets::oxi_rule::{horizontal_rule, vertical_rule};
 use crate::widgets::oxi_slider::slider;
 use crate::widgets::oxi_text_input::text_input;
-use crate::widgets::oxi_toggler::toggler;
+use crate::widgets::oxi_toggler::OxiToggler;
 use iced::widget::{Column, column, text};
 use iced::{Alignment, Length, Theme};
 
 pub fn test_app() -> iced::Result {
-    iced::application("pingpang", Counter::update, Counter::view)
+    iced::application(Counter::default, Counter::update, Counter::view)
         .theme(Counter::theme)
         .run()
 }
@@ -103,7 +103,7 @@ fn counter_box<'a>(state: &Counter) -> Column<'a, Message> {
             val as i64
         )),
         // TODO broken
-        toggler(state.is_toggled).on_toggle(Message::Toggle),
+        OxiToggler::new(state.is_toggled).on_toggle(Message::Toggle),
         progress_bar(0.0..=100.0, state.value as f32),
         Card::mk_title_card(
             String::from("test"),

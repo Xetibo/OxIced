@@ -6,9 +6,16 @@ edition = "2024"
 license = "LGPL-3.0-or-later"
 
 [dependencies]
-iced = { version = "0.13.1", features = ["advanced", "canvas", "svg"] }
+iced = { version = "0.14.0-dev", features = [
+	"advanced",
+	"canvas",
+	"svg",
+	"tokio",
+], path = "/home/dashie/gits/iced" }
+
+iced_layershell = { version = "0.14.0-dev", path = "/home/dashie/gits/exwlshelleventloop/iced_layershell" }
+
 # 13 is completely broken
-iced_layershell = "0.12.0"
 once_cell = "1.21.3"
 optional_struct = "0.5.2"
 serde = "1.0.219"

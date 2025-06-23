@@ -16,6 +16,7 @@ pub fn rule_style(_: &Theme) -> Style {
         width: 5,
         radius: Radius::from(2.0),
         fill_mode: FillMode::Percent(90.0),
+        snap: false,
     }
 }
 

@@ -14,13 +14,11 @@ pub fn progress_style(_: &Theme) -> Style {
         border: Border {
             color: palette.border_color_weak,
             width: 0.0,
-            radius: Radius::from(palette.border_radius),
+            radius: Radius::from(palette.border_radius as u16),
         },
     }
 }
 
 pub fn progress_bar<'a>(range: std::ops::RangeInclusive<f32>, value: f32) -> ProgressBar<'a> {
-    iced::widget::progress_bar(range, value)
-        .height(23)
-        .style(progress_style)
+    iced::widget::progress_bar(range, value).style(progress_style)
 }

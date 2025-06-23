@@ -31,6 +31,7 @@ pub fn get_derived_iced_theme() -> Theme {
         primary: theme.primary,
         success: theme.good,
         danger: theme.bad,
+        warning: theme.warning,
     };
     Theme::custom(String::from("OxiTheme"), palette)
 }
@@ -145,7 +146,7 @@ pub struct OxiTheme {
     pub shade_amount: f32,
     pub tint_amount: f32,
 
-    pub border_radius: u16,
+    pub border_radius: u32,
     /// Borders for Selectors and similar
     pub border_color_weak: String,
     /// Borders for hard cuts like sidebars
@@ -294,7 +295,7 @@ pub struct ComputedOxiTheme {
     pub shade_amount: f32,
     pub tint_amount: f32,
 
-    pub border_radius: u16,
+    pub border_radius: u32,
     pub border_color_weak: Color,
     pub border_color_strong: Color,
 

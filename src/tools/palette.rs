@@ -13,12 +13,7 @@ use oxiced::{
 };
 
 pub fn palette() -> Result<(), iced::Error> {
-    iced::application(
-        ThemeDisplay::title,
-        ThemeDisplay::update,
-        ThemeDisplay::view,
-    )
-    .run_with(ThemeDisplay::new)
+    iced::application(ThemeDisplay::new, ThemeDisplay::update, ThemeDisplay::view).run()
 }
 
 struct ThemeDisplay {
@@ -68,10 +63,6 @@ impl ThemeDisplay {
             },
             Task::none(),
         )
-    }
-
-    fn title(&self) -> String {
-        String::from("ThemeDisplay")
     }
 
     fn update(&mut self, _: Message) -> Task<Message> {
@@ -246,7 +237,7 @@ impl ThemeDisplay {
                     x: 50.0 + col as f32 * 600.0,
                     y: ((i as i32 + 1 - (col * count)) as f32 * 50.0) + 25.0,
                 },
-                vertical_alignment: iced::alignment::Vertical::Center,
+                // vertical_alignment: iced::alignment::Vertical::Center,
                 ..canvas::Text::default()
             });
             frame.fill_rectangle(

@@ -21,13 +21,14 @@ fn styled(background: Color, text: Color, shadow: Color) -> Style {
         border: Border {
             color: iced::Color::TRANSPARENT,
             width: 0.0,
-            radius: Radius::from(OXITHEME.border_radius),
+            radius: Radius::from(OXITHEME.border_radius as u16),
         },
         shadow: Shadow {
             color: shadow,
             offset: Vector { x: 0.2, y: 0.2 },
             blur_radius: 2.0,
         },
+        snap: false,
     }
 }
 

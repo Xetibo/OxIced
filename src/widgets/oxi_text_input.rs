@@ -13,7 +13,7 @@ pub fn text_input_style(_: &Theme, status: Status) -> Style {
         border: Border {
             color: palette.secondary_bg,
             width: 1.0,
-            radius: Radius::from(palette.border_radius),
+            radius: Radius::from(palette.border_radius as u16),
         },
         icon: palette.text,
         placeholder: palette.text_muted,
@@ -27,7 +27,7 @@ pub fn text_input_style(_: &Theme, status: Status) -> Style {
             style.border.color = palette.primary;
             style
         }
-        Status::Focused => {
+        Status::Focused { is_hovered } => {
             style.background = iced::Background::Color(palette.mantle);
             style.border.color = palette.primary;
             style
