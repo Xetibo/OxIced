@@ -1,20 +1,21 @@
 use crate::theme::legacy_theme::get_all_themes;
-use crate::theme::theme::get_derived_iced_theme;
+use crate::theme::theme_impl::get_derived_iced_theme;
 use crate::widgets::oxi_button::{ButtonVariant, button};
 use crate::widgets::oxi_card::Card;
 use crate::widgets::oxi_checkbox::checkbox;
 use crate::widgets::oxi_picklist::pick_list;
 use crate::widgets::oxi_progress::progress_bar;
-use crate::widgets::oxi_radio::radio;
+use crate::widgets::oxi_radio::OxiRadio;
+// use crate::widgets::oxi_radio::radio;
 use crate::widgets::oxi_rule::{horizontal_rule, vertical_rule};
 use crate::widgets::oxi_slider::slider;
 use crate::widgets::oxi_text_input::text_input;
-use crate::widgets::oxi_toggler::toggler;
+use crate::widgets::oxi_toggler::OxiToggler;
 use iced::widget::{Column, column, text};
 use iced::{Alignment, Length, Theme};
 
 pub fn test_app() -> iced::Result {
-    iced::application("pingpang", Counter::update, Counter::view)
+    iced::application(Counter::default, Counter::update, Counter::view)
         .theme(Counter::theme)
         .run()
 }
@@ -95,15 +96,16 @@ fn counter_box<'a>(state: &Counter) -> Column<'a, Message> {
         button("Decrement", ButtonVariant::Secondary).on_press(Message::Decrement(20)),
         button("success", ButtonVariant::Success).on_press(Message::Increment(10)),
         button("danger", ButtonVariant::Danger).on_press(Message::Increment(10)),
-        button("row", ButtonVariant::Neutral).on_press(Message::Increment(10)),
+        button("row", ButtonVariant::PrimaryBg).on_press(Message::Increment(10)),
         checkbox("what", state.is_checked, |_| { Message::Check() }),
-        radio("first", 10, Some(state.value), Message::Set),
-        radio("second", 20, Some(state.value), Message::Set),
+        OxiRadio::new(Some("testeroni"), Some(state.value), 10, Some(Message::Set)),
+        // radio("first", 10, Some(state.value), Message::Set),
+        // radio("second", 20, Some(state.value), Message::Set),
         slider(0.0..=100.0, state.value as f64, |val| Message::Set(
             val as i64
         )),
         // TODO broken
-        toggler(state.is_toggled).on_toggle(Message::Toggle),
+        OxiToggler::new(state.is_toggled).on_toggle(Message::Toggle),
         progress_bar(0.0..=100.0, state.value as f32),
         Card::mk_title_card(
             String::from("test"),

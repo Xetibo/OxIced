@@ -1,11 +1,11 @@
-use std::cell::Cell;
+use once_cell::sync::Lazy;
 
 use crate::widgets::oxi_svg::{SvgStyleVariant, svg_from_path};
 
-pub const ICONPATH: Cell<&'static str> = Cell::new("./assets/{}.svg");
+pub static ICONPATH: Lazy<&'static str> = Lazy::new(|| "./assets/{}.svg");
 
 fn path<I: ToString>(icon: I) -> String {
-    ICONPATH.get().replace("{}", &icon.to_string())
+    ICONPATH.replace("{}", &icon.to_string())
 }
 
 pub fn icon_widget<'a, I: ToString>(icon: I) -> iced::widget::Svg<'a> {

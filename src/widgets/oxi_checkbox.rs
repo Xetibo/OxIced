@@ -8,10 +8,10 @@ use iced::{
     },
 };
 
-use crate::theme::theme::OXITHEME;
+use crate::theme::theme_impl::OXITHEME;
 
 pub fn checkbox_style(_: &Theme, status: Status) -> Style {
-    let palette = OXITHEME;
+    let palette = &OXITHEME;
     let mut style = Style {
         background: iced::Background::Color(palette.tertiary_bg),
         text_color: Some(palette.text),

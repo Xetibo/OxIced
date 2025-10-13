@@ -51,6 +51,7 @@ impl dyn OxiAny {
     }
 
     #[inline]
+    /// # Safety
     pub unsafe fn downcast_mut_unchecked<T: OxiAny>(&mut self) -> &mut T {
         debug_assert!(self.is::<T>());
         // SAFETY: caller guarantees that T is the correct type
@@ -58,6 +59,7 @@ impl dyn OxiAny {
     }
 
     #[inline]
+    /// # Safety
     pub unsafe fn downcast_ref_unchecked<T: OxiAny>(&self) -> &T {
         debug_assert!(self.is::<T>());
         // SAFETY: caller guarantees that T is the correct type

@@ -6,7 +6,7 @@ use iced::{
 };
 
 use crate::{
-    theme::theme::OXITHEME,
+    theme::theme_impl::OXITHEME,
     widgets::{
         oxi_button::{self, ButtonVariant},
         oxi_icon::icon_widget,
@@ -32,7 +32,7 @@ impl<'a, T: Clone + 'a, I: ToString> CardHeader<'a, T, I> {
         icon_opt: Option<I>,
         element: Option<Element<'a, T>>,
     ) -> Element<'a, T> {
-        let palette = OXITHEME;
+        let palette = &OXITHEME;
         let mut elems: Vec<Element<'a, T>> = vec![
             text(title).size(palette.font_xl).into(),
             column!(element.unwrap_or(row!().into()))
@@ -77,11 +77,11 @@ impl<'a, T: Clone + 'a> Card<'a, T, String> {
 
 impl<'a, T: Clone + 'a, I: ToString + 'a> Card<'a, T, I> {
     fn style(_: &Theme) -> Style {
-        let palette = OXITHEME;
+        let palette = &OXITHEME;
 
         Style {
             background: Some(palette.mantle.into()),
-            border: border::rounded(palette.border_radius),
+            border: border::rounded(palette.border_radius as u16),
             ..Style::default()
         }
     }
@@ -90,7 +90,7 @@ impl<'a, T: Clone + 'a, I: ToString + 'a> Card<'a, T, I> {
         element: impl Into<Element<'a, T>>,
         on_click: fn() -> T,
     ) -> impl Into<Element<'a, T>> {
-        oxi_button::button(element, ButtonVariant::Neutral).on_press_with(on_click)
+        oxi_button::button(element, ButtonVariant::PrimaryBg).on_press_with(on_click)
     }
 
     fn view(self) -> Element<'a, T> {

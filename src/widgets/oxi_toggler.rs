@@ -1,74 +1,689 @@
-use iced::{
-    Theme,
-    widget::{
-        Toggler,
-        text::LineHeight,
-        toggler::{Status, Style},
-    },
-};
+//! OxiTogglers let users make binary choices by toggling a switch.
+//!
+//! # Example
+//! ```no_run
+//! # mod iced { pub mod widget { pub use iced_widget::*; } pub use iced_widget::Renderer; pub use iced_widget::core::*; }
+//! # pub type Element<'a, Message> = iced_widget::core::Element<'a, Message, iced_widget::Theme, iced_widget::Renderer>;
+//! #
+//! use iced::widget::toggler;
+//!
+//! struct State {
+//!    is_checked: bool,
+//! }
+//!
+//! enum Message {
+//!     OxiTogglerToggled(bool),
+//! }
+//!
+//! fn view(state: &State) -> Element<'_, Message> {
+//!     toggler(state.is_checked)
+//!         .label("Toggle me!")
+//!         .on_toggle(Message::OxiTogglerToggled)
+//!         .into()
+//! }
+//!
+//! fn update(state: &mut State, message: Message) {
+//!     match message {
+//!         Message::OxiTogglerToggled(is_checked) => {
+//!             state.is_checked = is_checked;
+//!         }
+//!     }
+//! }
+//! ```
 
-use crate::{
-    theme::theme::OXITHEME,
-    utils::color::{darken_color, disable_color},
-};
+use iced::advanced::Clipboard;
+use iced::advanced::Layout;
+use iced::advanced::Shell;
+use iced::advanced::Widget;
+use iced::advanced::layout;
+use iced::advanced::renderer;
+use iced::advanced::text;
+use iced::advanced::widget::tree::{self, Tree};
+use iced::alignment;
+use iced::animation::Easing;
+use iced::mouse;
+use iced::time::Instant;
+use iced::touch;
+use iced::widget;
+use iced::window;
+use iced::{Border, Color, Element, Event, Length, Pixels, Rectangle, Size, Theme};
+use lilt::Animated;
 
-pub fn toggler_style(_: &Theme, status: Status) -> Style {
-    let palette = OXITHEME;
-    let mut style = Style {
-        background: palette.secondary_bg,
-        background_border_width: 2.0,
-        background_border_color: palette.secondary_bg,
-        foreground: palette.primary,
-        foreground_border_width: 2.0,
-        foreground_border_color: palette.primary,
-    };
-    let toggled_style = Style {
-        background: palette.primary,
-        background_border_color: palette.primary,
-        foreground: palette.primary_contrast,
-        foreground_border_color: palette.primary_contrast,
-        ..style
-    };
-    match status {
-        Status::Active {
-            is_toggled: toggled,
-        } => {
-            let mut new_style = match toggled {
-                true => toggled_style,
-                false => style,
-            };
-            new_style.foreground = darken_color(&palette.primary_contrast, palette.tint_amount);
-            new_style.foreground_border_color =
-                darken_color(&palette.primary_contrast, palette.tint_amount);
-            new_style
-        }
-        Status::Hovered {
-            is_toggled: toggled,
-        } => {
-            let mut new_style = match toggled {
-                true => toggled_style,
-                false => style,
-            };
-            new_style.foreground = darken_color(&palette.primary_contrast, palette.shade_amount);
-            new_style.foreground_border_color =
-                darken_color(&palette.primary_contrast, palette.shade_amount);
-            new_style
-        }
-        // TODO
-        Status::Disabled => {
-            style.background = disable_color(&style.background);
-            style.background_border_color = disable_color(&style.background_border_color);
-            style.foreground = disable_color(&style.foreground);
-            style.foreground_border_color = disable_color(&style.foreground_border_color);
-            style
-        }
+fn mix(a: Color, b: Color, factor: f32) -> Color {
+    let b_amount = factor.clamp(0.0, 1.0);
+    let a_amount = 1.0 - b_amount;
+
+    let a_linear = a.into_linear().map(|c| c * a_amount);
+    let b_linear = b.into_linear().map(|c| c * b_amount);
+
+    Color::from_linear_rgba(
+        a_linear[0] + b_linear[0],
+        a_linear[1] + b_linear[1],
+        a_linear[2] + b_linear[2],
+        a_linear[3] + b_linear[3],
+    )
+}
+
+/// A toggler widget.
+///
+/// # Example
+/// ```no_run
+/// # mod iced { pub mod widget { pub use iced_widget::*; } pub use iced_widget::Renderer; pub use iced_widget::core::*; }
+/// # pub type Element<'a, Message> = iced_widget::core::Element<'a, Message, iced_widget::Theme, iced_widget::Renderer>;
+/// #
+/// use iced::widget::toggler;
+///
+/// struct State {
+///    is_checked: bool,
+/// }
+///
+/// enum Message {
+///     OxiTogglerToggled(bool),
+/// }
+///
+/// fn view(state: &State) -> Element<'_, Message> {
+///     toggler(state.is_checked)
+///         .label("Toggle me!")
+///         .on_toggle(Message::OxiTogglerToggled)
+///         .into()
+/// }
+///
+/// fn update(state: &mut State, message: Message) {
+///     match message {
+///         Message::OxiTogglerToggled(is_checked) => {
+///             state.is_checked = is_checked;
+///         }
+///     }
+/// }
+/// ```
+#[allow(missing_debug_implementations)]
+pub struct OxiToggler<'a, Message, Theme = iced::Theme, Renderer = iced::Renderer>
+where
+    Theme: Catalog,
+    Renderer: text::Renderer,
+{
+    is_toggled: bool,
+    on_toggle: Option<Box<dyn Fn(bool) -> Message + 'a>>,
+    label: Option<text::Fragment<'a>>,
+    width: Length,
+    size: f32,
+    text_size: Option<Pixels>,
+    text_line_height: text::LineHeight,
+    text_alignment: text::Alignment,
+    text_shaping: text::Shaping,
+    text_wrapping: text::Wrapping,
+    spacing: f32,
+    font: Option<Renderer::Font>,
+    class: Theme::Class<'a>,
+    last_status: Option<Status>,
+}
+
+/// The state of the [`OxiToggler`]
+#[derive(Debug)]
+pub struct State<Paragraph>
+where
+    Paragraph: text::Paragraph,
+{
+    now: Instant,
+    transition: Animated<bool, Instant>,
+    text_state: widget::text::State<Paragraph>,
+}
+
+impl<Paragraph> State<Paragraph>
+where
+    Paragraph: text::Paragraph,
+{
+    /// This check is meant to fix cases when we get a tainted state from another
+    /// ['OxiToggler'] widget by finding impossible cases.
+    fn is_animation_state_tainted(&self, is_toggled: bool) -> bool {
+        is_toggled != self.transition.value
     }
 }
 
-pub fn toggler<'a, M>(is_checked: bool) -> Toggler<'a, M> {
-    // TODO label and on toggle
-    iced::widget::toggler(is_checked)
-        .text_line_height(LineHeight::Relative(4.0))
-        .size(30)
-        .style(toggler_style)
+impl<'a, Message, Theme, Renderer> OxiToggler<'a, Message, Theme, Renderer>
+where
+    Theme: Catalog,
+    Renderer: text::Renderer,
+{
+    /// The default size of a [`OxiToggler`].
+    pub const DEFAULT_SIZE: f32 = 32.0;
+
+    /// Creates a new [`OxiToggler`].
+    ///
+    /// It expects:
+    ///   * a boolean describing whether the [`OxiToggler`] is checked or not
+    ///   * An optional label for the [`OxiToggler`]
+    ///   * a function that will be called when the [`OxiToggler`] is toggled. It
+    ///     will receive the new state of the [`OxiToggler`] and must produce a
+    ///     `Message`.
+    pub fn new(is_toggled: bool) -> Self {
+        OxiToggler {
+            is_toggled,
+            on_toggle: None,
+            label: None,
+            width: Length::Shrink,
+            size: Self::DEFAULT_SIZE,
+            text_size: None,
+            text_line_height: text::LineHeight::default(),
+            text_alignment: text::Alignment::Default,
+            text_shaping: text::Shaping::default(),
+            text_wrapping: text::Wrapping::default(),
+            spacing: Self::DEFAULT_SIZE / 2.0,
+            font: None,
+            class: Theme::default(),
+            last_status: None,
+        }
+    }
+
+    /// Sets the label of the [`OxiToggler`].
+    pub fn label(mut self, label: impl text::IntoFragment<'a>) -> Self {
+        self.label = Some(label.into_fragment());
+        self
+    }
+
+    /// Sets the message that should be produced when a user toggles
+    /// the [`OxiToggler`].
+    ///
+    /// If this method is not called, the [`OxiToggler`] will be disabled.
+    pub fn on_toggle(mut self, on_toggle: impl Fn(bool) -> Message + 'a) -> Self {
+        self.on_toggle = Some(Box::new(on_toggle));
+        self
+    }
+
+    /// Sets the message that should be produced when a user toggles
+    /// the [`OxiToggler`], if `Some`.
+    ///
+    /// If `None`, the [`OxiToggler`] will be disabled.
+    pub fn on_toggle_maybe(mut self, on_toggle: Option<impl Fn(bool) -> Message + 'a>) -> Self {
+        self.on_toggle = on_toggle.map(|on_toggle| Box::new(on_toggle) as _);
+        self
+    }
+
+    /// Sets the size of the [`OxiToggler`].
+    pub fn size(mut self, size: impl Into<Pixels>) -> Self {
+        self.size = size.into().0;
+        self
+    }
+
+    /// Sets the width of the [`OxiToggler`].
+    pub fn width(mut self, width: impl Into<Length>) -> Self {
+        self.width = width.into();
+        self
+    }
+
+    /// Sets the text size o the [`OxiToggler`].
+    pub fn text_size(mut self, text_size: impl Into<Pixels>) -> Self {
+        self.text_size = Some(text_size.into());
+        self
+    }
+
+    /// Sets the text [`text::LineHeight`] of the [`OxiToggler`].
+    pub fn text_line_height(mut self, line_height: impl Into<text::LineHeight>) -> Self {
+        self.text_line_height = line_height.into();
+        self
+    }
+
+    /// Sets the horizontal alignment of the text of the [`OxiToggler`]
+    pub fn text_alignment(mut self, alignment: impl Into<text::Alignment>) -> Self {
+        self.text_alignment = alignment.into();
+        self
+    }
+
+    /// Sets the [`text::Shaping`] strategy of the [`OxiToggler`].
+    pub fn text_shaping(mut self, shaping: text::Shaping) -> Self {
+        self.text_shaping = shaping;
+        self
+    }
+
+    /// Sets the [`text::Wrapping`] strategy of the [`OxiToggler`].
+    pub fn text_wrapping(mut self, wrapping: text::Wrapping) -> Self {
+        self.text_wrapping = wrapping;
+        self
+    }
+
+    /// Sets the spacing between the [`OxiToggler`] and the text.
+    pub fn spacing(mut self, spacing: impl Into<Pixels>) -> Self {
+        self.spacing = spacing.into().0;
+        self
+    }
+
+    /// Sets the [`Renderer::Font`] of the text of the [`OxiToggler`]
+    ///
+    /// [`Renderer::Font`]: crate::core::text::Renderer
+    pub fn font(mut self, font: impl Into<Renderer::Font>) -> Self {
+        self.font = Some(font.into());
+        self
+    }
+
+    /// Sets the style of the [`OxiToggler`].
+    #[must_use]
+    pub fn style(mut self, style: impl Fn(&Theme, Status) -> Style + 'a) -> Self
+    where
+        Theme::Class<'a>: From<StyleFn<'a, Theme>>,
+    {
+        self.class = (Box::new(style) as StyleFn<'a, Theme>).into();
+        self
+    }
+
+    /// Sets the style class of the [`OxiToggler`].
+    #[must_use]
+    pub fn class(mut self, class: impl Into<Theme::Class<'a>>) -> Self {
+        self.class = class.into();
+        self
+    }
+}
+
+impl<Message, Theme, Renderer> Widget<Message, Theme, Renderer>
+    for OxiToggler<'_, Message, Theme, Renderer>
+where
+    Theme: Catalog,
+    Renderer: text::Renderer,
+{
+    // what? is this necessary?
+    fn tag(&self) -> tree::Tag {
+        tree::Tag::of::<widget::text::State<Renderer::Paragraph>>()
+    }
+
+    // state, self explanatory
+    fn state(&self) -> tree::State {
+        tree::State::new(State {
+            now: Instant::now(),
+            transition: Animated::new(self.is_toggled).easing(Easing::EaseOut),
+            text_state: widget::text::State::<Renderer::Paragraph>::default(),
+        })
+    }
+
+    // no words
+    fn size(&self) -> Size<Length> {
+        Size {
+            width: self.width,
+            height: Length::Shrink,
+        }
+    }
+
+    // html?
+    fn layout(
+        &mut self,
+        tree: &mut Tree,
+        renderer: &Renderer,
+        limits: &layout::Limits,
+    ) -> layout::Node {
+        let limits = limits.width(self.width);
+
+        layout::next_to_each_other(
+            &limits,
+            self.spacing,
+            |_| layout::Node::new(Size::new(2.0 * self.size, self.size)),
+            |limits| {
+                if let Some(label) = self.label.as_deref() {
+                    let state = tree.state.downcast_mut::<State<Renderer::Paragraph>>();
+
+                    iced::advanced::widget::text::layout(
+                        &mut state.text_state,
+                        renderer,
+                        limits,
+                        label,
+                        widget::text::Format {
+                            width: self.width,
+                            height: Length::Shrink,
+                            line_height: self.text_line_height,
+                            size: self.text_size,
+                            font: self.font,
+                            align_x: self.text_alignment,
+                            align_y: alignment::Vertical::Top,
+                            shaping: self.text_shaping,
+                            wrapping: self.text_wrapping,
+                        },
+                    )
+                } else {
+                    layout::Node::new(Size::ZERO)
+                }
+            },
+        )
+    }
+
+    fn update(
+        // all of self
+        &mut self,
+        // tree of self, not the entire app
+        tree: &mut Tree,
+        // predefined events by iced
+        event: &Event,
+        // from above
+        layout: Layout<'_>,
+        cursor: mouse::Cursor,
+        _renderer: &Renderer,
+        _clipboard: &mut dyn Clipboard,
+        // the what?
+        shell: &mut Shell<'_, Message>,
+        _viewport: &Rectangle,
+    ) {
+        let Some(on_toggle) = &self.on_toggle else {
+            return;
+        };
+
+        match event {
+            Event::Mouse(mouse::Event::ButtonPressed(mouse::Button::Left))
+            | Event::Touch(touch::Event::FingerPressed { .. }) => {
+                let mouse_over = cursor.is_over(layout.bounds());
+
+                if mouse_over {
+                    let state = tree.state.downcast_mut::<State<Renderer::Paragraph>>();
+                    state
+                        .transition
+                        .transition(!self.is_toggled, Instant::now());
+                    shell.request_redraw();
+                    shell.publish(on_toggle(!self.is_toggled));
+                    shell.capture_event();
+                }
+            }
+            _ => {}
+        }
+
+        // why twice?
+        let state = tree.state.downcast_mut::<State<Renderer::Paragraph>>();
+
+        let animation_progress = state.transition.animate_bool(0.0, 1.0, Instant::now());
+        let current_status = if self.on_toggle.is_none() {
+            Status::Disabled
+        } else if cursor.is_over(layout.bounds()) {
+            Status::Hovered {
+                is_toggled: self.is_toggled,
+                animation_progress,
+            }
+        } else {
+            Status::Active {
+                is_toggled: self.is_toggled,
+                animation_progress,
+            }
+        };
+
+        if let Event::Window(window::Event::RedrawRequested(now)) = event {
+            state.now = *now;
+
+            // Reset animation on tainted state
+            if state.is_animation_state_tainted(self.is_toggled) {
+                state
+                    .transition
+                    .transition_instantaneous(self.is_toggled, Instant::now());
+            }
+
+            if state.transition.in_progress(*now) {
+                shell.request_redraw();
+            }
+            self.last_status = Some(current_status);
+        } else if self
+            .last_status
+            .is_some_and(|status| status != current_status)
+        {
+            shell.request_redraw();
+        }
+    }
+
+    fn mouse_interaction(
+        &self,
+        _state: &Tree,
+        layout: Layout<'_>,
+        cursor: mouse::Cursor,
+        _viewport: &Rectangle,
+        _renderer: &Renderer,
+    ) -> mouse::Interaction {
+        if cursor.is_over(layout.bounds()) {
+            if self.on_toggle.is_some() {
+                mouse::Interaction::Pointer
+            } else {
+                mouse::Interaction::NotAllowed
+            }
+        } else {
+            mouse::Interaction::default()
+        }
+    }
+
+    fn draw(
+        &self,
+        tree: &Tree,
+        renderer: &mut Renderer,
+        theme: &Theme,
+        style: &renderer::Style,
+        layout: Layout<'_>,
+        _cursor: mouse::Cursor,
+        viewport: &Rectangle,
+    ) {
+        /// Makes sure that the border radius of the toggler looks good at every size.
+        const BORDER_RADIUS_RATIO: f32 = 32.0 / 13.0;
+
+        /// The space ratio between the background Quad and the OxiToggler bounds, and
+        /// between the background Quad and foreground Quad.
+        const SPACE_RATIO: f32 = 0.05;
+
+        let mut children = layout.children();
+        let toggler_layout = children.next().unwrap();
+
+        if self.label.is_some() {
+            let label_layout = children.next().unwrap();
+            let state: &widget::text::State<Renderer::Paragraph> = &tree
+                .state
+                .downcast_ref::<State<Renderer::Paragraph>>()
+                .text_state;
+
+            iced::widget::text::draw(
+                renderer,
+                style,
+                label_layout.bounds(),
+                state.raw(),
+                iced::widget::text::Style::default(),
+                viewport,
+            );
+        }
+
+        let bounds = toggler_layout.bounds();
+        let style = theme.style(&self.class, self.last_status.unwrap_or(Status::Disabled));
+
+        let border_radius = bounds.height / BORDER_RADIUS_RATIO;
+        let space = SPACE_RATIO * bounds.height;
+
+        let toggler_background_bounds = Rectangle {
+            x: bounds.x + space,
+            y: bounds.y + space,
+            width: bounds.width - (2.0 * space),
+            height: bounds.height - (2.0 * space),
+        };
+
+        renderer.fill_quad(
+            renderer::Quad {
+                bounds: toggler_background_bounds,
+                border: Border {
+                    radius: border_radius.into(),
+                    width: style.background_border_width,
+                    color: style.background_border_color,
+                },
+                ..renderer::Quad::default()
+            },
+            style.background,
+        );
+
+        let x_ratio = style.foreground_bounds_horizontal_progress;
+        let toggler_foreground_bounds = Rectangle {
+            x: bounds.x + (2.0 * space + (x_ratio * (bounds.width - bounds.height))),
+            y: bounds.y + (2.0 * space),
+            width: bounds.height - (4.0 * space),
+            height: bounds.height - (4.0 * space),
+        };
+
+        renderer.fill_quad(
+            renderer::Quad {
+                bounds: toggler_foreground_bounds,
+                border: Border {
+                    radius: border_radius.into(),
+                    width: style.foreground_border_width,
+                    color: style.foreground_border_color,
+                },
+                ..renderer::Quad::default()
+            },
+            style.foreground,
+        );
+    }
+}
+
+impl<'a, Message, Theme, Renderer> From<OxiToggler<'a, Message, Theme, Renderer>>
+    for Element<'a, Message, Theme, Renderer>
+where
+    Message: 'a,
+    Theme: Catalog + 'a,
+    Renderer: text::Renderer + 'a,
+{
+    fn from(
+        toggler: OxiToggler<'a, Message, Theme, Renderer>,
+    ) -> Element<'a, Message, Theme, Renderer> {
+        Element::new(toggler)
+    }
+}
+
+/// The possible status of a [`OxiToggler`].
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum Status {
+    /// The [`OxiToggler`] can be interacted with.
+    Active {
+        /// Indicates whether the [`OxiToggler`] is toggled.
+        is_toggled: bool,
+        /// Current progress of the transition animation
+        animation_progress: f32,
+    },
+    /// The [`OxiToggler`] is being hovered.
+    Hovered {
+        /// Indicates whether the [`OxiToggler`] is toggled.
+        is_toggled: bool,
+        /// Current progress of the transition animation
+        animation_progress: f32,
+    },
+    /// The [`OxiToggler`] is disabled.
+    Disabled,
+}
+
+/// The appearance of a toggler.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Style {
+    /// The background [`Color`] of the toggler.
+    pub background: Color,
+    /// The width of the background border of the toggler.
+    pub background_border_width: f32,
+    /// The [`Color`] of the background border of the toggler.
+    pub background_border_color: Color,
+    /// The foreground [`Color`] of the toggler.
+    pub foreground: Color,
+    /// The width of the foreground border of the toggler.
+    pub foreground_border_width: f32,
+    /// The [`Color`] of the foreground border of the toggler.
+    pub foreground_border_color: Color,
+    /// The horizontal progress ratio of the foreground bounds of the toggler.
+    pub foreground_bounds_horizontal_progress: f32,
+}
+
+/// The theme catalog of a [`OxiToggler`].
+pub trait Catalog: Sized {
+    /// The item class of the [`Catalog`].
+    type Class<'a>;
+
+    /// The default class produced by the [`Catalog`].
+    fn default<'a>() -> Self::Class<'a>;
+
+    /// The [`Style`] of a class with the given status.
+    fn style(&self, class: &Self::Class<'_>, status: Status) -> Style;
+}
+
+/// A styling function for a [`OxiToggler`].
+///
+/// This is just a boxed closure: `Fn(&Theme, Status) -> Style`.
+pub type StyleFn<'a, Theme> = Box<dyn Fn(&Theme, Status) -> Style + 'a>;
+
+impl Catalog for Theme {
+    type Class<'a> = StyleFn<'a, Self>;
+
+    fn default<'a>() -> Self::Class<'a> {
+        Box::new(default)
+    }
+
+    fn style(&self, class: &Self::Class<'_>, status: Status) -> Style {
+        class(self, status)
+    }
+}
+
+/// The default style of a [`OxiToggler`].
+pub fn default(theme: &Theme, status: Status) -> Style {
+    let palette = theme.extended_palette();
+
+    let background = match status {
+        Status::Active {
+            is_toggled,
+            animation_progress,
+        }
+        | Status::Hovered {
+            is_toggled,
+            animation_progress,
+        } => {
+            if is_toggled {
+                mix(
+                    palette.primary.strong.color,
+                    palette.background.strong.color,
+                    1.0 - animation_progress,
+                )
+            } else {
+                mix(
+                    palette.background.strong.color,
+                    palette.primary.strong.color,
+                    animation_progress,
+                )
+            }
+        }
+        Status::Disabled => palette.background.weak.color,
+    };
+
+    let foreground = match status {
+        Status::Active {
+            is_toggled,
+            animation_progress: _,
+        } => {
+            if is_toggled {
+                palette.primary.strong.text
+            } else {
+                palette.background.base.color
+            }
+        }
+        Status::Hovered {
+            is_toggled,
+            animation_progress: _,
+        } => {
+            if is_toggled {
+                Color {
+                    a: 0.5,
+                    ..palette.primary.strong.text
+                }
+            } else {
+                palette.background.weak.color
+            }
+        }
+        Status::Disabled => palette.background.base.color,
+    };
+
+    let foreground_bounds_horizontal_progress = match status {
+        Status::Active {
+            is_toggled: _,
+            animation_progress,
+        } => animation_progress,
+        Status::Hovered {
+            is_toggled: _,
+            animation_progress,
+        } => animation_progress,
+        Status::Disabled => 0.0,
+    };
+
+    Style {
+        background,
+        foreground,
+        foreground_border_width: 0.0,
+        foreground_border_color: Color::TRANSPARENT,
+        background_border_width: 0.0,
+        background_border_color: Color::TRANSPARENT,
+        foreground_bounds_horizontal_progress,
+    }
 }

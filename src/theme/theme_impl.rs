@@ -8,10 +8,10 @@ use crate::utils::{
     file::get_theme_toml,
 };
 
-pub const OXITHEME: Lazy<ComputedOxiTheme> = Lazy::new(|| {
+pub static OXITHEME: Lazy<ComputedOxiTheme> = Lazy::new(|| {
     let default_theme = default_theme();
     let theme_str_opt = get_theme_toml();
-    if let Err(_) = theme_str_opt {
+    if theme_str_opt.is_err() {
         return ComputedOxiTheme::from(default_theme);
     };
     let theme_opt = toml::from_str::<OptionalOxiTheme>(&theme_str_opt.unwrap());
@@ -24,26 +24,30 @@ pub const OXITHEME: Lazy<ComputedOxiTheme> = Lazy::new(|| {
 });
 
 pub fn get_derived_iced_theme() -> Theme {
-    let theme = OXITHEME;
+    let theme = &OXITHEME;
     let palette = Palette {
-        background: theme.base,
+        background: theme.mantle,
         text: theme.text,
         primary: theme.primary,
         success: theme.good,
         danger: theme.bad,
+        warning: theme.warning,
     };
     Theme::custom(String::from("OxiTheme"), palette)
 }
 
 fn default_theme() -> OxiTheme {
     OxiTheme {
-        base: String::from("1e1e2e"),
-        mantle: String::from("181825"),
-        primary_bg: String::from("313244"),
-        secondary_bg: String::from("45475a"),
+        base: String::from("313244"), // TODO beforepr needed?
+        mantle: String::from("1e1e2e"),
+        primary_bg: String::from("181825"),
+        secondary_bg: String::from("313244"),
+        // String::from("45475a"),// TODO beforepr needed?
         tertiary_bg: String::from("585b70"),
         text: String::from("cdd6f4"),
         text_muted: String::from("585b70"),
+        tint: String::from("ffffff"),
+        shade: String::from("000000"),
         primary: String::from("89b4fa"),
         secondary: String::from("b4befe"),
         primary_contrast: String::from("ffffff"),
@@ -107,6 +111,13 @@ pub struct OxiTheme {
     /// Base16: base03 -> surface2
     pub text_muted: String,
 
+    /// Tint color
+    /// highlights something
+    pub tint: String,
+    /// Shade color
+    /// darkens something
+    pub shade: String,
+
     // Base 16 ?? where do we take primary??
     /// Primary theme color
     /// Buttons etc
@@ -145,7 +156,7 @@ pub struct OxiTheme {
     pub shade_amount: f32,
     pub tint_amount: f32,
 
-    pub border_radius: u16,
+    pub border_radius: u32,
     /// Borders for Selectors and similar
     pub border_color_weak: String,
     /// Borders for hard cuts like sidebars
@@ -183,6 +194,8 @@ impl From<OxiTheme> for ComputedOxiTheme {
             tertiary_bg_active: mk_light_color(&value.tertiary_bg, value.shade_amount),
             text: mk_color(&value.text),
             text_muted: mk_color(&value.text_muted),
+            tint: mk_color(&value.tint),
+            shade: mk_color(&value.shade),
             primary: mk_color(&value.primary),
             primary_hover: mk_dark_color(&value.primary, value.tint_amount),
             primary_active: mk_dark_color(&value.primary, value.shade_amount),
@@ -255,6 +268,9 @@ pub struct ComputedOxiTheme {
     pub text: Color,
     pub text_muted: Color,
 
+    pub tint: Color,
+    pub shade: Color,
+
     pub primary: Color,
     pub primary_hover: Color,
     pub primary_active: Color,
@@ -294,7 +310,7 @@ pub struct ComputedOxiTheme {
     pub shade_amount: f32,
     pub tint_amount: f32,
 
-    pub border_radius: u16,
+    pub border_radius: u32,
     pub border_color_weak: Color,
     pub border_color_strong: Color,
 

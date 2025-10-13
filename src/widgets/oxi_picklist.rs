@@ -7,17 +7,17 @@ use iced::{
     widget::{self, PickList},
 };
 
-use crate::theme::theme::OXITHEME;
+use crate::theme::theme_impl::OXITHEME;
 
 pub fn picklist_style(_: &Theme, status: widget::pick_list::Status) -> widget::pick_list::Style {
-    let palette = OXITHEME;
+    let palette = &OXITHEME;
     let mut style = widget::pick_list::Style {
         background: iced::Background::Color(palette.primary_bg),
         text_color: palette.text,
         border: Border {
             color: palette.primary_bg,
             width: 1.0,
-            radius: Radius::from(palette.border_radius),
+            radius: Radius::from(palette.border_radius as u16),
         },
         placeholder_color: palette.text,
         handle_color: palette.text,
@@ -28,7 +28,7 @@ pub fn picklist_style(_: &Theme, status: widget::pick_list::Status) -> widget::p
             style.background = iced::Background::Color(palette.primary_bg_hover);
             style
         }
-        widget::pick_list::Status::Opened => {
+        widget::pick_list::Status::Opened { is_hovered: _ } => {
             style.border.color = palette.primary;
             style
         }
@@ -36,15 +36,14 @@ pub fn picklist_style(_: &Theme, status: widget::pick_list::Status) -> widget::p
 }
 
 pub fn menu_style(_: &Theme) -> menu::Style {
-    let palette = OXITHEME;
+    let palette = &OXITHEME;
     menu::Style {
-        background: iced::Background::Color(palette.base),
+        background: iced::Background::Color(palette.mantle),
         text_color: palette.text,
         border: Border {
             color: palette.primary,
             width: 2.0,
-            // TODO this should be dependend on the index
-            radius: Radius::from(palette.border_radius),
+            radius: Radius::from(OXITHEME.border_radius as u16),
         },
         selected_text_color: palette.text,
         selected_background: iced::Background::Color(palette.primary_bg_hover),

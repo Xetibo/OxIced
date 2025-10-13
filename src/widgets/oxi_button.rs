@@ -4,14 +4,15 @@ use iced::{
     widget::button::{Status, Style},
 };
 
-use crate::theme::theme::OXITHEME;
+use crate::theme::theme_impl::OXITHEME;
 
 pub enum ButtonVariant {
     Primary,
     Secondary,
     Success,
     Danger,
-    Neutral,
+    PrimaryBg,
+    SecondaryBg,
 }
 
 fn styled(background: Color, text: Color, shadow: Color) -> Style {
@@ -21,13 +22,14 @@ fn styled(background: Color, text: Color, shadow: Color) -> Style {
         border: Border {
             color: iced::Color::TRANSPARENT,
             width: 0.0,
-            radius: Radius::from(OXITHEME.border_radius),
+            radius: Radius::from(OXITHEME.border_radius as u16),
         },
         shadow: Shadow {
             color: shadow,
             offset: Vector { x: 0.2, y: 0.2 },
             blur_radius: 2.0,
         },
+        snap: false,
     }
 }
 
@@ -57,13 +59,13 @@ fn states(status: Status, base: Style, pressed: Color, hovered: Color) -> Style 
 }
 
 pub fn primary_button(_: &Theme, status: Status) -> Style {
-    let palette = OXITHEME;
+    let palette = &OXITHEME;
     let base = styled(palette.primary, palette.primary_contrast, palette.primary);
     states(status, base, palette.primary_active, palette.primary_hover)
 }
 
-pub fn neutral_button(_: &Theme, status: Status) -> Style {
-    let palette = OXITHEME;
+pub fn primary_bg_button(_: &Theme, status: Status) -> Style {
+    let palette = &OXITHEME;
     let color = palette.primary_bg;
     let base = styled(color, palette.text, color);
     states(
@@ -74,8 +76,20 @@ pub fn neutral_button(_: &Theme, status: Status) -> Style {
     )
 }
 
+pub fn secondary_bg_button(_: &Theme, status: Status) -> Style {
+    let palette = &OXITHEME;
+    let color = palette.secondary_bg;
+    let base = styled(color, palette.text, color);
+    states(
+        status,
+        base,
+        palette.secondary_bg_active,
+        palette.secondary_bg_hover,
+    )
+}
+
 pub fn secondary_button(_: &Theme, status: Status) -> Style {
-    let palette = OXITHEME;
+    let palette = &OXITHEME;
     let base = styled(
         palette.secondary,
         palette.secondary_contrast,
@@ -90,13 +104,13 @@ pub fn secondary_button(_: &Theme, status: Status) -> Style {
 }
 
 pub fn success_button(_: &Theme, status: Status) -> Style {
-    let palette = OXITHEME;
+    let palette = &OXITHEME;
     let base = styled(palette.good, palette.good_contrast, palette.good);
     states(status, base, palette.good_active, palette.good_hover)
 }
 
 pub fn danger_button(_: &Theme, status: Status) -> Style {
-    let palette = OXITHEME;
+    let palette = &OXITHEME;
     let base = styled(palette.bad, palette.bad_contrast, palette.bad);
     states(status, base, palette.bad_active, palette.bad_hover)
 }
@@ -110,7 +124,8 @@ pub fn button<'a, M>(
         ButtonVariant::Secondary => secondary_button,
         ButtonVariant::Success => success_button,
         ButtonVariant::Danger => danger_button,
-        ButtonVariant::Neutral => neutral_button,
+        ButtonVariant::PrimaryBg => primary_bg_button,
+        ButtonVariant::SecondaryBg => secondary_bg_button,
     };
     iced::widget::button(content)
         .padding(OXITHEME.padding_md)

@@ -4,16 +4,16 @@ use iced::{
     widget::text_input::{Status, Style},
 };
 
-use crate::theme::theme::OXITHEME;
+use crate::theme::theme_impl::OXITHEME;
 
 pub fn text_input_style(_: &Theme, status: Status) -> Style {
-    let palette = OXITHEME;
+    let palette = &OXITHEME;
     let mut style = Style {
         background: iced::Background::Color(palette.mantle),
         border: Border {
             color: palette.secondary_bg,
             width: 1.0,
-            radius: Radius::from(palette.border_radius),
+            radius: Radius::from(palette.border_radius as u16),
         },
         icon: palette.text,
         placeholder: palette.text_muted,
@@ -27,7 +27,7 @@ pub fn text_input_style(_: &Theme, status: Status) -> Style {
             style.border.color = palette.primary;
             style
         }
-        Status::Focused => {
+        Status::Focused { is_hovered: _ } => {
             style.background = iced::Background::Color(palette.mantle);
             style.border.color = palette.primary;
             style

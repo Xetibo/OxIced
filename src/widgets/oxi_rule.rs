@@ -7,22 +7,22 @@ use iced::{
     },
 };
 
-use crate::theme::theme::OXITHEME;
+use crate::theme::theme_impl::OXITHEME;
 
 pub fn rule_style(_: &Theme) -> Style {
-    let palette = OXITHEME;
+    let palette = &OXITHEME;
     Style {
         color: palette.primary,
-        width: 5,
         radius: Radius::from(2.0),
         fill_mode: FillMode::Percent(90.0),
+        snap: false,
     }
 }
 
 pub fn vertical_rule<'a>(width: impl Into<Pixels>) -> Rule<'a> {
-    iced::widget::vertical_rule(width).style(rule_style)
+    iced::widget::rule::vertical(width).style(rule_style)
 }
 
 pub fn horizontal_rule<'a>(width: impl Into<Pixels>) -> Rule<'a> {
-    iced::widget::horizontal_rule(width).style(rule_style)
+    iced::widget::rule::horizontal(width).style(rule_style)
 }

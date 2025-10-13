@@ -7,10 +7,10 @@ use iced::{
     },
 };
 
-use crate::theme::theme::OXITHEME;
+use crate::theme::theme_impl::OXITHEME;
 
 pub fn slider_style(_: &Theme, status: Status) -> Style {
-    let palette = OXITHEME;
+    let palette = &OXITHEME;
     let style = Style {
         rail: Rail {
             backgrounds: (
