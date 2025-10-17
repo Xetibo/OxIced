@@ -14,7 +14,7 @@ iced = { version = "0.14.0-dev", features = [
 	"tokio",
 ], git = "https://github.com/iced-rs/iced" }
 
-iced_layershell = { version = "0.14.0-dev", git = "https://github.com/waycrate/exwlshelleventloop" }
+iced_layershell = { version="0.14.0-dev", git = "https://github.com/DashieTM/exwlshelleventloop" }
 lilt = "0.8.1"
 
 # 13 is completely broken
