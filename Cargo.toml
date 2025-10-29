@@ -8,13 +8,12 @@ license = "LGPL-3.0-or-later"
 [dependencies]
 iced = { version = "0.14.0-dev", features = [
 	"advanced",
+	"tokio",
 	"canvas",
 	"image",
 	"svg",
-	"tokio",
-], git = "https://github.com/iced-rs/iced" }
-
-iced_layershell = { version="0.14.0-dev", git = "https://github.com/DashieTM/exwlshelleventloop" }
+], git = "https://github.com/iced-rs/iced", rev="bfc27e4691875840010e3d1e282b8e26b821c569" }
+iced_layershell = { version = "0.14.0-dev", git = "https://github.com/DashieTM/exwlshelleventloop"}
 lilt = "0.8.1"
 
 # 13 is completely broken

@@ -45,6 +45,7 @@
             inputsFrom = builtins.attrValues self'.packages;
             buildInputs = with pkgs; [
               libGL
+              libclang
               libxkbcommon
               wayland
               pkg-config
