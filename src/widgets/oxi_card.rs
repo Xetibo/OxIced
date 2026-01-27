@@ -81,7 +81,7 @@ impl<'a, T: Clone + 'a, I: ToString + 'a> Card<'a, T, I> {
 
         Style {
             background: Some(palette.mantle.into()),
-            border: border::rounded(palette.border_radius as u16),
+            border: border::rounded(palette.border_radius),
             ..Style::default()
         }
     }

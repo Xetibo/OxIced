@@ -11,7 +11,7 @@ use serde::{Deserialize, de::DeserializeOwned};
 use crate::{
     theme::theme_impl::OXITHEME,
     utils::{
-        color::{darken_color, lighten_color},
+        color::{darken_color, lighten_color, mk_color_from_hex},
         file::get_theme_toml,
     },
 };
@@ -190,194 +190,216 @@ impl From<TomlBase16> for Extended {
         Extended {
             background: Background {
                 base: Pair {
-                    color: color!(
-                        u32::from_str_radix(hex.background_base_color, 16).unwrap_or(0) as f32
+                    color: mk_color_from_hex(
+                        u32::from_str_radix(hex.background_base_color, 16).unwrap_or(0),
                     ),
-                    text: color!(
-                        u32::from_str_radix(hex.background_base_text, 16).unwrap_or(0) as f32
+                    text: mk_color_from_hex(
+                        u32::from_str_radix(hex.background_base_text, 16).unwrap_or(0),
                     ),
                 },
                 weak: Pair {
-                    color: color!(
-                        u32::from_str_radix(hex.background_weak_color, 16).unwrap_or(0) as f32
+                    color: mk_color_from_hex(
+                        u32::from_str_radix(hex.background_weak_color, 16).unwrap_or(0),
                     ),
-                    text: color!(
-                        u32::from_str_radix(hex.background_weak_text, 16).unwrap_or(0) as f32
+                    text: mk_color_from_hex(
+                        u32::from_str_radix(hex.background_weak_text, 16).unwrap_or(0),
                     ),
                 },
                 weaker: Pair {
-                    color: color!(
-                        u32::from_str_radix(hex.background_weak_color, 16).unwrap_or(0) as f32
+                    color: mk_color_from_hex(
+                        u32::from_str_radix(hex.background_weak_color, 16).unwrap_or(0),
                     ),
-                    text: color!(
-                        u32::from_str_radix(hex.background_weak_text, 16).unwrap_or(0) as f32
+                    text: mk_color_from_hex(
+                        u32::from_str_radix(hex.background_weak_text, 16).unwrap_or(0),
                     ),
                 },
                 strong: Pair {
-                    color: color!(
-                        u32::from_str_radix(hex.background_strong_color, 16).unwrap_or(0) as f32
+                    color: mk_color_from_hex(
+                        u32::from_str_radix(hex.background_strong_color, 16).unwrap_or(0),
                     ),
-                    text: color!(
-                        u32::from_str_radix(hex.background_strong_text, 16).unwrap_or(0) as f32
+                    text: mk_color_from_hex(
+                        u32::from_str_radix(hex.background_strong_text, 16).unwrap_or(0),
                     ),
                 },
                 stronger: Pair {
-                    color: color!(
-                        u32::from_str_radix(hex.background_strong_color, 16).unwrap_or(0) as f32
+                    color: mk_color_from_hex(
+                        u32::from_str_radix(hex.background_strong_color, 16).unwrap_or(0),
                     ),
-                    text: color!(
-                        u32::from_str_radix(hex.background_strong_text, 16).unwrap_or(0) as f32
+                    text: mk_color_from_hex(
+                        u32::from_str_radix(hex.background_strong_text, 16).unwrap_or(0),
                     ),
                 },
                 weakest: Pair {
-                    color: color!(
-                        u32::from_str_radix(hex.background_strong_color, 16).unwrap_or(0) as f32
+                    color: mk_color_from_hex(
+                        u32::from_str_radix(hex.background_strong_color, 16).unwrap_or(0),
                     ),
-                    text: color!(
-                        u32::from_str_radix(hex.background_strong_text, 16).unwrap_or(0) as f32
+                    text: mk_color_from_hex(
+                        u32::from_str_radix(hex.background_strong_text, 16).unwrap_or(0),
                     ),
                 },
                 strongest: Pair {
-                    color: color!(
-                        u32::from_str_radix(hex.background_strong_color, 16).unwrap_or(0) as f32
+                    color: mk_color_from_hex(
+                        u32::from_str_radix(hex.background_strong_color, 16).unwrap_or(0),
                     ),
-                    text: color!(
-                        u32::from_str_radix(hex.background_strong_text, 16).unwrap_or(0) as f32
+                    text: mk_color_from_hex(
+                        u32::from_str_radix(hex.background_strong_text, 16).unwrap_or(0),
                     ),
                 },
                 neutral: Pair {
-                    color: color!(
-                        u32::from_str_radix(hex.background_base_color, 16).unwrap_or(0) as f32
+                    color: mk_color_from_hex(
+                        u32::from_str_radix(hex.background_base_color, 16).unwrap_or(0),
                     ),
-                    text: color!(
-                        u32::from_str_radix(hex.background_base_text, 16).unwrap_or(0) as f32
+                    text: mk_color_from_hex(
+                        u32::from_str_radix(hex.background_base_text, 16).unwrap_or(0),
                     ),
                 },
             },
             primary: Primary {
                 base: Pair {
-                    color: color!(
-                        u32::from_str_radix(hex.primary_base_color, 16).unwrap_or(0) as f32
+                    color: mk_color_from_hex(
+                        u32::from_str_radix(hex.primary_base_color, 16).unwrap_or(0),
                     ),
-                    text: color!(u32::from_str_radix(hex.primary_base_text, 16).unwrap_or(0) as f32),
+                    text: mk_color_from_hex(
+                        u32::from_str_radix(hex.primary_base_text, 16).unwrap_or(0),
+                    ),
                 },
                 weak: Pair {
-                    color: color!(
-                        u32::from_str_radix(hex.primary_weak_color, 16).unwrap_or(0) as f32
+                    color: mk_color_from_hex(
+                        u32::from_str_radix(hex.primary_weak_color, 16).unwrap_or(0),
                     ),
-                    text: color!(u32::from_str_radix(hex.primary_weak_text, 16).unwrap_or(0) as f32),
+                    text: mk_color_from_hex(
+                        u32::from_str_radix(hex.primary_weak_text, 16).unwrap_or(0),
+                    ),
                 },
                 strong: Pair {
-                    color: color!(
-                        u32::from_str_radix(hex.primary_strong_color, 16).unwrap_or(0) as f32
+                    color: mk_color_from_hex(
+                        u32::from_str_radix(hex.primary_strong_color, 16).unwrap_or(0),
                     ),
-                    text: color!(
-                        u32::from_str_radix(hex.primary_strong_text, 16).unwrap_or(0) as f32
+                    text: mk_color_from_hex(
+                        u32::from_str_radix(hex.primary_strong_text, 16).unwrap_or(0),
                     ),
                 },
             },
             secondary: Secondary {
                 base: Pair {
-                    color: color!(
-                        u32::from_str_radix(hex.secondary_base_color, 16).unwrap_or(0) as f32
+                    color: mk_color_from_hex(
+                        u32::from_str_radix(hex.secondary_base_color, 16).unwrap_or(0),
                     ),
-                    text: color!(
-                        u32::from_str_radix(hex.secondary_base_text, 16).unwrap_or(0) as f32
+                    text: mk_color_from_hex(
+                        u32::from_str_radix(hex.secondary_base_text, 16).unwrap_or(0),
                     ),
                 },
                 weak: Pair {
-                    color: color!(
-                        u32::from_str_radix(hex.secondary_weak_color, 16).unwrap_or(0) as f32
+                    color: mk_color_from_hex(
+                        u32::from_str_radix(hex.secondary_weak_color, 16).unwrap_or(0),
                     ),
-                    text: color!(
-                        u32::from_str_radix(hex.secondary_weak_text, 16).unwrap_or(0) as f32
+                    text: mk_color_from_hex(
+                        u32::from_str_radix(hex.secondary_weak_text, 16).unwrap_or(0),
                     ),
                 },
                 strong: Pair {
-                    color: color!(
-                        u32::from_str_radix(hex.secondary_strong_color, 16).unwrap_or(0) as f32
+                    color: mk_color_from_hex(
+                        u32::from_str_radix(hex.secondary_strong_color, 16).unwrap_or(0),
                     ),
-                    text: color!(
-                        u32::from_str_radix(hex.secondary_strong_text, 16).unwrap_or(0) as f32
+                    text: mk_color_from_hex(
+                        u32::from_str_radix(hex.secondary_strong_text, 16).unwrap_or(0),
                     ),
                 },
             },
             success: Success {
                 base: Pair {
-                    color: color!(
-                        u32::from_str_radix(hex.success_base_color, 16).unwrap_or(0) as f32
+                    color: mk_color_from_hex(
+                        u32::from_str_radix(hex.success_base_color, 16).unwrap_or(0),
                     ),
-                    text: color!(u32::from_str_radix(hex.success_base_text, 16).unwrap_or(0) as f32),
+                    text: mk_color_from_hex(
+                        u32::from_str_radix(hex.success_base_text, 16).unwrap_or(0),
+                    ),
                 },
                 weak: Pair {
                     color: darken_color(
-                        &color!(u32::from_str_radix(hex.success_weak_color, 16).unwrap_or(0) as f32),
-                        OXITHEME.tint_amount,
-                    ),
-                    text: color!(u32::from_str_radix(hex.success_weak_text, 16).unwrap_or(0) as f32),
-                },
-                strong: Pair {
-                    color: lighten_color(
-                        &color!(
-                            u32::from_str_radix(hex.success_strong_color, 16).unwrap_or(0) as f32
+                        &mk_color_from_hex(
+                            u32::from_str_radix(hex.success_weak_color, 16).unwrap_or(0),
                         ),
                         OXITHEME.tint_amount,
                     ),
-                    text: color!(
-                        u32::from_str_radix(hex.success_strong_text, 16).unwrap_or(0) as f32
+                    text: mk_color_from_hex(
+                        u32::from_str_radix(hex.success_weak_text, 16).unwrap_or(0),
+                    ),
+                },
+                strong: Pair {
+                    color: lighten_color(
+                        &mk_color_from_hex(
+                            u32::from_str_radix(hex.success_strong_color, 16).unwrap_or(0),
+                        ),
+                        OXITHEME.tint_amount,
+                    ),
+                    text: mk_color_from_hex(
+                        u32::from_str_radix(hex.success_strong_text, 16).unwrap_or(0),
                     ),
                 },
             },
             danger: Danger {
                 base: Pair {
-                    color: color!(
-                        u32::from_str_radix(hex.danger_base_color, 16).unwrap_or(0) as f32
+                    color: mk_color_from_hex(
+                        u32::from_str_radix(hex.danger_base_color, 16).unwrap_or(0),
                     ),
-                    text: color!(u32::from_str_radix(hex.danger_base_text, 16).unwrap_or(0) as f32),
+                    text: mk_color_from_hex(
+                        u32::from_str_radix(hex.danger_base_text, 16).unwrap_or(0),
+                    ),
                 },
                 weak: Pair {
                     color: darken_color(
-                        &color!(u32::from_str_radix(hex.danger_weak_color, 16).unwrap_or(0) as f32),
-                        OXITHEME.tint_amount,
-                    ),
-                    text: color!(u32::from_str_radix(hex.danger_weak_text, 16).unwrap_or(0) as f32),
-                },
-                strong: Pair {
-                    color: lighten_color(
-                        &color!(
-                            u32::from_str_radix(hex.danger_strong_color, 16).unwrap_or(0) as f32
+                        &mk_color_from_hex(
+                            u32::from_str_radix(hex.danger_weak_color, 16).unwrap_or(0),
                         ),
                         OXITHEME.tint_amount,
                     ),
-                    text: color!(
-                        u32::from_str_radix(hex.danger_strong_text, 16).unwrap_or(0) as f32
+                    text: mk_color_from_hex(
+                        u32::from_str_radix(hex.danger_weak_text, 16).unwrap_or(0),
+                    ),
+                },
+                strong: Pair {
+                    color: lighten_color(
+                        &mk_color_from_hex(
+                            u32::from_str_radix(hex.danger_strong_color, 16).unwrap_or(0),
+                        ),
+                        OXITHEME.tint_amount,
+                    ),
+                    text: mk_color_from_hex(
+                        u32::from_str_radix(hex.danger_strong_text, 16).unwrap_or(0),
                     ),
                 },
             },
             is_dark: true,
             warning: Warning {
                 base: Pair {
-                    color: color!(
-                        u32::from_str_radix(hex.danger_base_color, 16).unwrap_or(0) as f32
+                    color: mk_color_from_hex(
+                        u32::from_str_radix(hex.danger_base_color, 16).unwrap_or(0),
                     ),
-                    text: color!(u32::from_str_radix(hex.danger_base_text, 16).unwrap_or(0) as f32),
+                    text: mk_color_from_hex(
+                        u32::from_str_radix(hex.danger_base_text, 16).unwrap_or(0),
+                    ),
                 },
                 weak: Pair {
                     color: darken_color(
-                        &color!(u32::from_str_radix(hex.danger_weak_color, 16).unwrap_or(0) as f32),
-                        OXITHEME.tint_amount,
-                    ),
-                    text: color!(u32::from_str_radix(hex.danger_weak_text, 16).unwrap_or(0) as f32),
-                },
-                strong: Pair {
-                    color: lighten_color(
-                        &color!(
-                            u32::from_str_radix(hex.danger_strong_color, 16).unwrap_or(0) as f32
+                        &mk_color_from_hex(
+                            u32::from_str_radix(hex.danger_weak_color, 16).unwrap_or(0),
                         ),
                         OXITHEME.tint_amount,
                     ),
-                    text: color!(
-                        u32::from_str_radix(hex.danger_strong_text, 16).unwrap_or(0) as f32
+                    text: mk_color_from_hex(
+                        u32::from_str_radix(hex.danger_weak_text, 16).unwrap_or(0),
+                    ),
+                },
+                strong: Pair {
+                    color: lighten_color(
+                        &mk_color_from_hex(
+                            u32::from_str_radix(hex.danger_strong_color, 16).unwrap_or(0),
+                        ),
+                        OXITHEME.tint_amount,
+                    ),
+                    text: mk_color_from_hex(
+                        u32::from_str_radix(hex.danger_strong_text, 16).unwrap_or(0),
                     ),
                 },
             },
@@ -404,12 +426,12 @@ pub struct TomlSimple {
 impl From<TomlSimple> for Palette {
     fn from(val: TomlSimple) -> Self {
         Palette {
-            background: color!(val.background),
-            text: color!(val.text),
-            primary: color!(val.primary),
-            success: color!(val.success),
-            danger: color!(val.danger),
-            warning: color!(val.warning),
+            background: mk_color_from_hex(val.background),
+            text: mk_color_from_hex(val.text),
+            primary: mk_color_from_hex(val.primary),
+            success: mk_color_from_hex(val.success),
+            danger: mk_color_from_hex(val.danger),
+            warning: mk_color_from_hex(val.warning),
         }
     }
 }
@@ -430,107 +452,107 @@ impl From<TomlExtended> for Extended {
         Extended {
             background: Background {
                 base: Pair {
-                    color: color!(val.background.base.color),
-                    text: color!(val.background.base.text),
+                    color: mk_color_from_hex(val.background.base.color),
+                    text: mk_color_from_hex(val.background.base.text),
                 },
                 weak: Pair {
-                    color: color!(val.background.weak.color),
-                    text: color!(val.background.weak.text),
+                    color: mk_color_from_hex(val.background.weak.color),
+                    text: mk_color_from_hex(val.background.weak.text),
                 },
                 weaker: Pair {
-                    color: color!(val.background.weak.color),
-                    text: color!(val.background.weak.text),
+                    color: mk_color_from_hex(val.background.weak.color),
+                    text: mk_color_from_hex(val.background.weak.text),
                 },
                 strong: Pair {
-                    color: color!(val.background.strong.color),
-                    text: color!(val.background.strong.text),
+                    color: mk_color_from_hex(val.background.strong.color),
+                    text: mk_color_from_hex(val.background.strong.text),
                 },
                 stronger: Pair {
-                    color: color!(val.background.strong.color),
-                    text: color!(val.background.strong.text),
+                    color: mk_color_from_hex(val.background.strong.color),
+                    text: mk_color_from_hex(val.background.strong.text),
                 },
                 weakest: Pair {
-                    color: color!(val.background.strong.color),
-                    text: color!(val.background.strong.text),
+                    color: mk_color_from_hex(val.background.strong.color),
+                    text: mk_color_from_hex(val.background.strong.text),
                 },
                 strongest: Pair {
-                    color: color!(val.background.strong.color),
-                    text: color!(val.background.strong.text),
+                    color: mk_color_from_hex(val.background.strong.color),
+                    text: mk_color_from_hex(val.background.strong.text),
                 },
                 neutral: Pair {
-                    color: color!(val.background.base.color),
-                    text: color!(val.background.base.text),
+                    color: mk_color_from_hex(val.background.base.color),
+                    text: mk_color_from_hex(val.background.base.text),
                 },
             },
             primary: Primary {
                 base: Pair {
-                    color: color!(val.primary.base.color),
-                    text: color!(val.primary.base.text),
+                    color: mk_color_from_hex(val.primary.base.color),
+                    text: mk_color_from_hex(val.primary.base.text),
                 },
                 weak: Pair {
-                    color: color!(val.primary.weak.color),
-                    text: color!(val.primary.weak.text),
+                    color: mk_color_from_hex(val.primary.weak.color),
+                    text: mk_color_from_hex(val.primary.weak.text),
                 },
                 strong: Pair {
-                    color: color!(val.primary.strong.color),
-                    text: color!(val.primary.strong.text),
+                    color: mk_color_from_hex(val.primary.strong.color),
+                    text: mk_color_from_hex(val.primary.strong.text),
                 },
             },
             secondary: Secondary {
                 base: Pair {
-                    color: color!(val.secondary.base.color),
-                    text: color!(val.secondary.base.text),
+                    color: mk_color_from_hex(val.secondary.base.color),
+                    text: mk_color_from_hex(val.secondary.base.text),
                 },
                 weak: Pair {
-                    color: color!(val.secondary.weak.color),
-                    text: color!(val.secondary.weak.text),
+                    color: mk_color_from_hex(val.secondary.weak.color),
+                    text: mk_color_from_hex(val.secondary.weak.text),
                 },
                 strong: Pair {
-                    color: color!(val.secondary.strong.color),
-                    text: color!(val.secondary.strong.text),
+                    color: mk_color_from_hex(val.secondary.strong.color),
+                    text: mk_color_from_hex(val.secondary.strong.text),
                 },
             },
             success: Success {
                 base: Pair {
-                    color: color!(val.success.base.color),
-                    text: color!(val.success.base.text),
+                    color: mk_color_from_hex(val.success.base.color),
+                    text: mk_color_from_hex(val.success.base.text),
                 },
                 weak: Pair {
-                    color: color!(val.success.weak.color),
-                    text: color!(val.success.weak.text),
+                    color: mk_color_from_hex(val.success.weak.color),
+                    text: mk_color_from_hex(val.success.weak.text),
                 },
                 strong: Pair {
-                    color: color!(val.success.strong.color),
-                    text: color!(val.success.strong.text),
+                    color: mk_color_from_hex(val.success.strong.color),
+                    text: mk_color_from_hex(val.success.strong.text),
                 },
             },
             danger: Danger {
                 base: Pair {
-                    color: color!(val.danger.base.color),
-                    text: color!(val.danger.base.text),
+                    color: mk_color_from_hex(val.danger.base.color),
+                    text: mk_color_from_hex(val.danger.base.text),
                 },
                 weak: Pair {
-                    color: color!(val.danger.weak.color),
-                    text: color!(val.danger.weak.text),
+                    color: mk_color_from_hex(val.danger.weak.color),
+                    text: mk_color_from_hex(val.danger.weak.text),
                 },
                 strong: Pair {
-                    color: color!(val.danger.strong.color),
-                    text: color!(val.danger.strong.text),
+                    color: mk_color_from_hex(val.danger.strong.color),
+                    text: mk_color_from_hex(val.danger.strong.text),
                 },
             },
             is_dark: val.is_dark,
             warning: Warning {
                 base: Pair {
-                    color: color!(val.danger.base.color),
-                    text: color!(val.danger.base.text),
+                    color: mk_color_from_hex(val.danger.base.color),
+                    text: mk_color_from_hex(val.danger.base.text),
                 },
                 weak: Pair {
-                    color: color!(val.danger.weak.color),
-                    text: color!(val.danger.weak.text),
+                    color: mk_color_from_hex(val.danger.weak.color),
+                    text: mk_color_from_hex(val.danger.weak.text),
                 },
                 strong: Pair {
-                    color: color!(val.danger.strong.color),
-                    text: color!(val.danger.strong.text),
+                    color: mk_color_from_hex(val.danger.strong.color),
+                    text: mk_color_from_hex(val.danger.strong.text),
                 },
             },
         }
@@ -608,11 +630,11 @@ fn tokyo_generate(palette: Palette) -> Extended {
                 text: palette.text,
             },
             weak: Pair {
-                color: color!(0x222430), // used for dropdowns etc
+                color: mk_color_from_hex(0x222430), // used for dropdowns etc
                 text: palette.text,
             },
             weaker: Pair {
-                color: color!(0x222430), // used for dropdowns etc
+                color: mk_color_from_hex(0x222430), // used for dropdowns etc
                 text: palette.text,
             },
             strong: Pair {
@@ -638,7 +660,7 @@ fn tokyo_generate(palette: Palette) -> Extended {
         },
         primary: Primary {
             base: Pair {
-                color: color!(0x282A38), // used for buttons default and hovered dropdowns
+                color: mk_color_from_hex(0x282A38), // used for buttons default and hovered dropdowns
                 text: palette.text,
             },
             weak: Pair {
@@ -647,7 +669,7 @@ fn tokyo_generate(palette: Palette) -> Extended {
             },
             strong: Pair {
                 // ???????????????????????????????/
-                color: color!(0x3E4052), // used for buttons when hovered
+                color: mk_color_from_hex(0x3E4052), // used for buttons when hovered
                 text: palette.text,
             },
         },

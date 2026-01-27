@@ -4,7 +4,7 @@ use crate::tools::{palette::palette, test_app::test_app};
 
 pub mod theme;
 mod tools;
-mod utils;
+pub mod utils;
 pub mod widgets;
 
 pub fn main() -> Result<(), iced::Error> {

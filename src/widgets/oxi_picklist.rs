@@ -1,7 +1,7 @@
 use std::borrow::Borrow;
 
 use iced::{
-    Border, Theme,
+    Border, Shadow, Theme,
     border::Radius,
     overlay::menu,
     widget::{self, PickList},
@@ -17,7 +17,7 @@ pub fn picklist_style(_: &Theme, status: widget::pick_list::Status) -> widget::p
         border: Border {
             color: palette.primary_bg,
             width: 1.0,
-            radius: Radius::from(palette.border_radius as u16),
+            radius: Radius::from(palette.border_radius),
         },
         placeholder_color: palette.text,
         handle_color: palette.text,
@@ -43,10 +43,11 @@ pub fn menu_style(_: &Theme) -> menu::Style {
         border: Border {
             color: palette.primary,
             width: 2.0,
-            radius: Radius::from(OXITHEME.border_radius as u16),
+            radius: Radius::from(OXITHEME.border_radius),
         },
         selected_text_color: palette.text,
         selected_background: iced::Background::Color(palette.primary_bg_hover),
+        shadow: Shadow::default(),
     }
 }
 

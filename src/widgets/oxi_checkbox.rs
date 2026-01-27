@@ -74,7 +74,8 @@ pub fn checkbox<'a, M>(
     is_checked: bool,
     user_on_toggle: impl Fn(bool) -> M + 'a,
 ) -> Checkbox<'a, M> {
-    iced::widget::checkbox(label, is_checked)
+    iced::widget::checkbox(is_checked)
+        .label(label.into())
         .size(25)
         .spacing(OXITHEME.padding_lg)
         .width(OXITHEME.padding_lg)

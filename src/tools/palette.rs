@@ -254,7 +254,7 @@ impl ThemeDisplay {
         }
     }
 
-    fn view(&self) -> Element<Message> {
+    fn view(&'_ self) -> Element<'_, Message> {
         iced::widget::Canvas::new(self)
             .height(Fill)
             .width(Fill)

@@ -75,7 +75,7 @@ impl Counter {
         }
     }
 
-    fn view(&self) -> Column<Message> {
+    fn view(&'_ self) -> Column<'_, Message> {
         column![
             counter_box(self),
             pick_list(get_all_themes(), Some(&self.theme), Message::Theme).width(Length::Fill),

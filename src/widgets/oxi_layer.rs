@@ -11,7 +11,7 @@ fn box_style(theme: &Theme) -> Style {
         background: Some(iced::Background::Color(palette.mantle)),
         border: iced::border::color(palette.primary)
             .width(3)
-            .rounded(palette.border_radius as u16),
+            .rounded(palette.border_radius),
         ..container::rounded_box(theme)
     }
 }

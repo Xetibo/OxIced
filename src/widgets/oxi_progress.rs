@@ -14,7 +14,7 @@ pub fn progress_style(_: &Theme) -> Style {
         border: Border {
             color: palette.border_color_weak,
             width: 0.0,
-            radius: Radius::from(palette.border_radius as u16),
+            radius: Radius::from(palette.border_radius),
         },
     }
 }

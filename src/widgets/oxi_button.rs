@@ -22,7 +22,7 @@ fn styled(background: Color, text: Color, shadow: Color) -> Style {
         border: Border {
             color: iced::Color::TRANSPARENT,
             width: 0.0,
-            radius: Radius::from(OXITHEME.border_radius as u16),
+            radius: Radius::from(OXITHEME.border_radius),
         },
         shadow: Shadow {
             color: shadow,

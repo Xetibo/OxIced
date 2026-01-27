@@ -13,7 +13,7 @@ pub fn text_input_style(_: &Theme, status: Status) -> Style {
         border: Border {
             color: palette.secondary_bg,
             width: 1.0,
-            radius: Radius::from(palette.border_radius as u16),
+            radius: Radius::from(palette.border_radius),
         },
         icon: palette.text,
         placeholder: palette.text_muted,
