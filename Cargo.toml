@@ -13,7 +13,7 @@ iced = { version = "0.14.0", features = [
 	"image",
 	"svg",
 ]}
-iced_layershell = { version = "0.14.2"}
+iced_layershell = { version = "0.17.1"}
 lilt = "0.8.1"
 
 # 13 is completely broken
