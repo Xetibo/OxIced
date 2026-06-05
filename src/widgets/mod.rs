@@ -5,6 +5,7 @@ pub mod oxi_checkbox;
 pub mod oxi_icon;
 pub mod oxi_layer;
 pub mod oxi_picklist;
+pub mod oxi_plugin;
 pub mod oxi_progress;
 pub mod oxi_radio;
 pub mod oxi_rule;

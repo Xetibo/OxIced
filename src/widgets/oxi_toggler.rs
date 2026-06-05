@@ -2,9 +2,7 @@
 //!
 //! # Example
 //! ```no_run
-//! # mod iced { pub mod widget { pub use iced_widget::*; } pub use iced_widget::Renderer; pub use iced_widget::core::*; }
-//! # pub type Element<'a, Message> = iced_widget::core::Element<'a, Message, iced_widget::Theme, iced_widget::Renderer>;
-//! #
+//! # use iced::Element;
 //! use iced::widget::toggler;
 //!
 //! struct State {
@@ -68,9 +66,7 @@ fn mix(a: Color, b: Color, factor: f32) -> Color {
 ///
 /// # Example
 /// ```no_run
-/// # mod iced { pub mod widget { pub use iced_widget::*; } pub use iced_widget::Renderer; pub use iced_widget::core::*; }
-/// # pub type Element<'a, Message> = iced_widget::core::Element<'a, Message, iced_widget::Theme, iced_widget::Renderer>;
-/// #
+/// # use iced::Element;
 /// use iced::widget::toggler;
 ///
 /// struct State {
